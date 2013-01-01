@@ -72,6 +72,6 @@ Admin only:
 
 Note: some commands are WIP and so aren't shown here. Feel free to use them,\
 but keep in mind they might change in the future."""
-msgStart = "This is PolBot! He can help you take care of your house finances. Use /help for more info."
+msgStart = "This is PolBot! Just a modular bot made in python. Currently allows for custom message in response to commands in group chats. Promote to admin to keep it from missing messages! Try /cmd and /rmcmd to add commands :) "
 
 msgIpAddress = "The bot's IP address is: "
