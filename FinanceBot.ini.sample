@@ -1,0 +1,16 @@
+[KEYS]
+# give your bot KEY here.
+BOT_API_KEY= writeKeyHere!
+
+[ADMIN]
+# following two are required for an admin to clear the debts -
+# otherwise, no clearing possible.
+Telegram_ID=123456789
+Telegram_handle=@blablabla
+
+[SETTINGS]
+# The currency code in UTF-8. 
+# Default is "£", the pound sign.
+# Other currencies can be found here:
+# http://www.fileformat.info/info/unicode/category/Sc/list.htm
+currency_code=163
