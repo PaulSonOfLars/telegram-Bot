@@ -26,7 +26,8 @@ msgStart = "This is FinanceBot! He can help you take care of your house finances
 msgNoMoneyOwed = "Lucky... that person doesn't owe anything!"
 msgListMoneyOwed = "Here is a list of people owing money:\n"
 msgNoDebts = "Wow... there are no debts here!"
-
+msgAllDebtsCleared = "All debts cleared!"
+msgAllDebtsClearedTerm = msgDebtsCleared + " A backup file can be found in bckp.json."
 # error strings
 errNoFile = "Either file is missing or is not readable. Creating."
 errBadFormat = "Command badly formatted. Use /help for help."
@@ -142,8 +143,8 @@ def clear(bot, update, args):
     if len(args) == 1 and args[0] == "all":
             dumpjson("./bckp.json", owed)
             owed.pop(chat_id)
-            update.message.reply_text("All debts cleared!")
-            print("All debts were cleared! A backed up file can be found in bckp.json")
+            update.message.reply_text(msgAllDebtsCleared)
+            print(msgAllDebtsClearedTerm)
 
     elif len(args) == 2:
         try: owed[chat_id][args[0]]
