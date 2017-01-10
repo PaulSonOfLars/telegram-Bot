@@ -27,7 +27,7 @@ msgNoMoneyOwed = "Lucky... that person doesn't owe anything!"
 msgListMoneyOwed = "Here is a list of people owing money:\n"
 msgNoDebts = "Wow... there are no debts here!"
 msgAllDebtsCleared = "All debts cleared!"
-msgAllDebtsClearedTerm = msgDebtsCleared + " A backup file can be found in bckp.json."
+msgAllDebtsClearedTerm = msgAllDebtsCleared + " A backup file can be found in bckp.json."
 # error strings
 errNoFile = "Either file is missing or is not readable. Creating."
 errBadFormat = "Command badly formatted. Use /help for help."
