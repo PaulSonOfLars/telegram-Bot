@@ -1,2 +1,5 @@
+# ignore al json dictionaries
 *.json
+
+# ignore personal settings (with key)
 FinanceBot.ini
