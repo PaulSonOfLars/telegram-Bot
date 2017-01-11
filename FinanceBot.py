@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 from telegram.ext import Updater, CommandHandler
@@ -8,26 +8,29 @@ import json
 import helper
 import strings
 import subprocess
+
 # INITIALISE
 config = configparser.ConfigParser()
 config.read("FinanceBot.ini")
 
-global admin_ID
-admin_ID = int(config["ADMIN"]["Telegram_ID"])
+global owner_ID
+owner_ID = int(config["OWNER"]["Telegram_ID"])
 
 global currency
-# set correct currency from config file. Should be in hexadecimal.
-currency = unichr(int(config["SETTINGS"]["currency_code"], 16))
+currency = config["SETTINGS"]["currency_code"]
 
 updater = Updater(config["KEYS"]["BOT_API_KEY"])
 dispatcher = updater.dispatcher
 
-logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO)
+logging.basicConfig(
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        level=logging.INFO)
 
 logger = logging.getLogger(__name__)
 
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
+
 def __repr__(self):
     return str(self)
 
@@ -36,8 +39,10 @@ def __repr__(self):
 def start(bot, update):
     update.message.reply_text(strings.msgStart)
 
+
 def help(bot, update):
     update.message.reply_text(strings.msgHelp)
+
 
 def owe(bot, update, args):
     owed = helper.loadjson("./owed.json", "owed.json")
@@ -57,20 +62,22 @@ def owe(bot, update, args):
 
     elif len(args) == 1:
         try: 
-            res = "Here is a list of everyone " + args[0] + " owes money to: \n"
+            res = "Here is a list of everyone " + args[0] \
+                  + " owes money to: \n"
             res = helper.print_owed(owed, chat_id, args[0], res, currency)
         except KeyError:
             res = args[0] + " has no debts!"
     update.message.reply_text(res)
+
 
 def clear(bot, update, args):
     owed = helper.loadjson("./owed.json", "owed.json")
     chat_id = str(update.message.chat_id)
     sender = update.message.from_user
     
-    if sender.id != admin_ID:
+    if sender.id != owner_ID:
         update.message.reply_text(strings.errNotAdmin)
-        print ("User " + sender.username + " tried to issue an admin command.")
+        print ("User " + sender.username + " tried to issue an owner command.")
         return
 
     if len(args) == 1 and args[0] == "all":
@@ -87,12 +94,13 @@ def clear(bot, update, args):
 
         if args[1] == "all":
             owed[chat_id].pop(args[0])
-            print(args[0] + " had all debts cleared by the admin.")
+            print(args[0] + " had all debts cleared by the owner.")
         
         else:
             owed[chat_id][args[0]].pop(args[1])
-            update.message.reply_text(args[0] + "'s debts to " + args[1] + " were cleared.")
-            print(args[0] + " had debts to " + args[1] + " cleared by admin.")
+            update.message.reply_text(args[0] + "'s debts to " \
+                                      + args[1] + " were cleared.")
+            print(args[0] + " had debts to " + args[1] + " cleared by owner.")
 
             # remove from database if no debts
             if owed[chat_id] == {}:
@@ -155,13 +163,20 @@ def owes(bot, update, args):
     
     helper.dumpjson("./owed.json", owed)   
 
+
 def idme(bot, update):
-    update.message.reply_text("Your ID is: " + str(update.message.from_user.id))
+    update.message.reply_text("Your ID is: " \
+                               + str(update.message.from_user.id))
+
 
 def getBotIp(bot, update):
     sender = update.message.from_user
-    if sender.id == admin_ID:
-        update.message.reply_text("The bot's IP address is: " + subprocess.check_output(["curl", "ipinfo.io/ip"]))
+    if sender.id == owner_ID:
+        update.message.reply_text("The bot's IP address is: " \
+                + subprocess.check_output(["curl", "ipinfo.io/ip"],
+                                          universal_newlines=True,
+                                          timeout=5))
+
 # LINK FUNCTIONS
 
 dispatcher.add_handler(CommandHandler("start", start))
@@ -171,6 +186,7 @@ dispatcher.add_handler(CommandHandler("owe", owe, pass_args=True))
 dispatcher.add_handler(CommandHandler("owes", owes, pass_args=True))
 dispatcher.add_handler(CommandHandler("idme", idme))
 dispatcher.add_handler(CommandHandler("botip", getBotIp))
+dispatcher.add_handler(CommandHandler("idme", idme))
 
 updater.start_polling()
 updater.idle()
