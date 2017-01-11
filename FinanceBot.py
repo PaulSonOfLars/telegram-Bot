@@ -13,7 +13,6 @@ import os
 msgHelp = """Hi! This bot is currently WIP. I'm working on it!
 current commands are:
 - /start the bot introduces itself.
-- /hey prints a welcome string.
 - /help prints this message.
 - /owes <ower> <owee> <sum> tells you ower owes X to owee.
 - /owe prints a list of all people owing money.
