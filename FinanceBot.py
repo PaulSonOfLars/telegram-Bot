@@ -7,7 +7,7 @@ import configparser
 import json
 import helper
 import strings
-
+import subprocess
 # INITIALISE
 config = configparser.ConfigParser()
 config.read("FinanceBot.ini")
@@ -158,6 +158,10 @@ def owes(bot, update, args):
 def idme(bot, update):
     update.message.reply_text("Your ID is: " + str(update.message.from_user.id))
 
+def getBotIp(bot, update):
+    sender = update.message.from_user
+    if sender.id == admin_ID:
+        update.message.reply_text("The bot's IP address is: " + subprocess.check_output(["curl", "ipinfo.io/ip"]))
 # LINK FUNCTIONS
 
 dispatcher.add_handler(CommandHandler("start", start))
@@ -166,6 +170,7 @@ dispatcher.add_handler(CommandHandler("clear", clear, pass_args=True))
 dispatcher.add_handler(CommandHandler("owe", owe, pass_args=True))
 dispatcher.add_handler(CommandHandler("owes", owes, pass_args=True))
 dispatcher.add_handler(CommandHandler("idme", idme))
+dispatcher.add_handler(CommandHandler("botip", getBotIp))
 
 updater.start_polling()
 updater.idle()
