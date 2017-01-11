@@ -1,10 +1,10 @@
 import json
 import os
-
+import strings
 
 def loadjson(PATH, filename):
     if not os.path.isfile(PATH) or not os.access(PATH, os.R_OK):
-        print(errNoFile)
+        print(strings.errNoFile)
         name = {}
         with open(filename, "w") as f:
             json.dump(name, f)
@@ -20,6 +20,6 @@ def print_owed(owed, chat_id, ower, res, currency):
     for owee in owed[chat_id][ower]:
         val = owed[chat_id][ower][owee]
         res += "\n" + ower + " owes " + owee + " " + currency + str(val)
-                            
+    
     return res
 

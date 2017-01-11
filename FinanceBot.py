@@ -43,9 +43,6 @@ def owe(bot, update, args):
     owed = helper.loadjson("./owed.json", "owed.json")
     chat_id = str(update.message.chat_id)
     
-    try: owed
-    except NameError: owed = {}
-    
     try: owed[chat_id]
     except KeyError: owed[chat_id] = {}
     
@@ -59,15 +56,11 @@ def owe(bot, update, args):
                 res = helper.print_owed(owed, chat_id, ower, res, currency)
 
     elif len(args) == 1:
-        res = "Here is a list of everyone " + args[0] + " owes money to: \n"
-        
-        try:
-            if len(owed[chat_id][args[0]]) == 0:
-                raise KeyError
+        try: 
+            res = "Here is a list of everyone " + args[0] + " owes money to: \n"
             res = helper.print_owed(owed, chat_id, args[0], res, currency)
-        except KeyError: 
-            res = strings.msgNoMoneyOwed
-    
+        except KeyError:
+            res = args[0] + " has no debts!"
     update.message.reply_text(res)
 
 def clear(bot, update, args):
@@ -79,15 +72,6 @@ def clear(bot, update, args):
         update.message.reply_text(strings.errNotAdmin)
         print ("User " + sender.username + " tried to issue an admin command.")
         return
-
-    try: owed
-    except NameError:
-        owed = {}
-        print ("Got empty strings.err. Creating...")
-
-    try: owed[chat_id]
-    except KeyError:
-        print ("No key found. Ignoring.")
 
     if len(args) == 1 and args[0] == "all":
             helper.dumpjson("./bckp.json", owed)
@@ -129,7 +113,7 @@ def owes(bot, update, args):
     try: owed
     except NameError: 
         owed = {}
-        print("Got empty strings.err. Creating...")
+        print("Got empty err. Creating...")
     
     try: owed[chat_id]
     except KeyError: 
@@ -158,8 +142,13 @@ def owes(bot, update, args):
         owed[chat_id][args[0]][args[1]] += float(args[2])
         
         # check whether owed sum is now 0 and removes if necessary
+        # also this makes a nice shape if you have tabs = 4
         if owed[chat_id][args[0]][args[1]] == 0:
             owed[chat_id][args[0]].pop(args[1])
+            if owed[chat_id][args[0]] == {}:
+                owed[chat_id].pop(args[0])
+                if owed[chat_id] == {}:
+                    owed.pop(chat_id)
     
     else:
         update.message.reply_text(strings.errBadFormat)
