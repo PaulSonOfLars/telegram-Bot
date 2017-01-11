@@ -5,42 +5,15 @@ from telegram.ext import Updater, CommandHandler
 import logging
 import configparser
 import json
-import os
-
-# DECLARE STRINGS
-
-# messages
-msgHelp = """Hi! This bot is currently WIP. I'm working on it!
-current commands are:
-- /start the bot introduces itself.
-- /help prints this message.
-- /owes <ower> <owee> <sum> tells you ower owes X to owee.
-- /owe prints a list of all people owing money.
-- /owe <ower> prints a list of all people being owed money to.
-- /clear `all` clears the entire database of owed money.
-- /clear <ower> `all` clears everything the ower owes.
-- /clear <ower> <owee> clears the debt of ower towards owee.
-- /idme returns your telegram ID."""
-msgStart = "This is FinanceBot! He can help you take care of your house finances. Use /help for more info."
-msgNoMoneyOwed = "Lucky... that person doesn't owe anything!"
-msgListMoneyOwed = "Here is a list of people owing money:\n"
-msgNoDebts = "Wow... there are no debts here!"
-msgAllDebtsCleared = "All debts cleared!"
-msgAllDebtsClearedTerm = msgAllDebtsCleared + " A backup file can be found in bckp.json."
-# error strings
-errNoFile = "Either file is missing or is not readable. Creating."
-errBadFormat = "Command badly formatted. Use /help for help."
-errNotInt = "You gave me an invalid sum! Please only use numbers/decimals (ie, dont specify the currency, this is specified by the owner.)"
-errNotAdmin = "You are not admin! You can't run this command."
-errNoOwer = "There is no-one here with this name: "
-errAllName = "\"all\" cannot be used as a name!"
+import helper
+import strings
 
 # INITIALISE
 config = configparser.ConfigParser()
 config.read("FinanceBot.ini")
 
 global admin_ID
-admin_ID= int(config["ADMIN"]["Telegram_ID"])
+admin_ID = int(config["ADMIN"]["Telegram_ID"])
 
 global currency
 # set correct currency from config file. Should be in hexadecimal.
@@ -58,39 +31,16 @@ def error(bot, update, error):
 def __repr__(self):
     return str(self)
 
-# COMMON FUNCTIONS
-
-def loadjson(PATH, filename):
-    if not os.path.isfile(PATH) or not os.access(PATH, os.R_OK):
-        print(errNoFile)
-        name = {}
-        with open(filename, "w") as f:
-            json.dump(name, f)
-    with open(filename) as f:
-        name = json.load(f)
-    return name
-
-def dumpjson(filename, var):
-    with open(filename, "w") as f:
-        json.dump(var, f)
-
 # ACTUAL FUNCTIONS START HERE
 
 def start(bot, update):
-    update.message.reply_text(msgStart)
+    update.message.reply_text(strings.msgStart)
 
 def help(bot, update):
-    update.message.reply_text(msgHelp)
-
-def print_owed(owed, chat_id, ower, res):
-    for owee in owed[chat_id][ower]:
-        val = owed[chat_id][ower][owee]
-        res += "\n" + ower + " owes " + owee + " " + currency + str(val)
-
-    return res
+    update.message.reply_text(strings.msgHelp)
 
 def owe(bot, update, args):
-    owed = loadjson("./owed.json", "owed.json")
+    owed = helper.loadjson("./owed.json", "owed.json")
     chat_id = str(update.message.chat_id)
     
     try: owed
@@ -99,14 +49,14 @@ def owe(bot, update, args):
     try: owed[chat_id]
     except KeyError: owed[chat_id] = {}
     
-    res = msgNoDebts
+    res = strings.msgNoDebts
     if len(args) == 0: 
         if len(owed[chat_id]) == 0:
-            res = msgNoDebts    
+            res = strings.msgNoDebts    
         else:
-            res = msgListMoneyOwed
+            res = strings.msgListMoneyOwed
             for ower in owed[chat_id]:
-                res = print_owed(owed, chat_id, ower, res)
+                res = helper.print_owed(owed, chat_id, ower, res, currency)
 
     elif len(args) == 1:
         res = "Here is a list of everyone " + args[0] + " owes money to: \n"
@@ -114,41 +64,41 @@ def owe(bot, update, args):
         try:
             if len(owed[chat_id][args[0]]) == 0:
                 raise KeyError
-            res = print_owed(owed, chat_id, args[0], res)
+            res = helper.print_owed(owed, chat_id, args[0], res, currency)
         except KeyError: 
-            res = msgNoMoneyOwed
+            res = strings.msgNoMoneyOwed
     
     update.message.reply_text(res)
 
 def clear(bot, update, args):
-    owed = loadjson("./owed.json", "owed.json")
+    owed = helper.loadjson("./owed.json", "owed.json")
     chat_id = str(update.message.chat_id)
     sender = update.message.from_user
     
     if sender.id != admin_ID:
-        update.message.reply_text(errNotAdmin)
+        update.message.reply_text(strings.errNotAdmin)
         print ("User " + sender.username + " tried to issue an admin command.")
         return
 
     try: owed
     except NameError:
         owed = {}
-        print ("Got empty err. Creating...")
+        print ("Got empty strings.err. Creating...")
 
     try: owed[chat_id]
     except KeyError:
         print ("No key found. Ignoring.")
 
     if len(args) == 1 and args[0] == "all":
-            dumpjson("./bckp.json", owed)
+            helper.dumpjson("./bckp.json", owed)
             owed.pop(chat_id)
-            update.message.reply_text(msgAllDebtsCleared)
-            print(msgAllDebtsClearedTerm)
+            update.message.reply_text(strings.msgAllDebtsCleared)
+            print(strings.msgAllDebtsClearedTerm)
 
     elif len(args) == 2:
         try: owed[chat_id][args[0]]
         except KeyError:
-            update.message.reply_text(errNoOwer + args[0])
+            update.message.reply_text(strings.errNoOwer + args[0])
             return
 
         if args[1] == "all":
@@ -167,19 +117,19 @@ def clear(bot, update, args):
                 owed[chat_id].pop(args[0])
 
     else: 
-        update.message.reply_text(errBadFormat)
+        update.message.reply_text(strings.errBadFormat)
 
-    dumpjson("./owed.json", owed)
+    helper.dumpjson("./owed.json", owed)
     
 
 def owes(bot, update, args):
-    owed = loadjson("./owed.json", "owed.json")
+    owed = helper.loadjson("./owed.json", "owed.json")
     chat_id = str(update.message.chat_id)
     
     try: owed
     except NameError: 
         owed = {}
-        print("Got empty err. Creating...")
+        print("Got empty strings.err. Creating...")
     
     try: owed[chat_id]
     except KeyError: 
@@ -189,11 +139,11 @@ def owes(bot, update, args):
     if len(args) == 3:
         
         if args[0] == "all" or args[1] == "all":
-            update.message.reply_text(errAllName)
+            update.message.reply_text(strings.errAllName)
             return
 
         try: float(args[2])
-        except ValueError: update.message.reply_text(errNotInt)
+        except ValueError: update.message.reply_text(strings.errNotInt)
 
         try: owed[chat_id][args[0]]
         except: 
@@ -212,21 +162,21 @@ def owes(bot, update, args):
             owed[chat_id][args[0]].pop(args[1])
     
     else:
-        update.message.reply_text(errBadFormat)
+        update.message.reply_text(strings.errBadFormat)
     
-    dumpjson("./owed.json", owed)   
+    helper.dumpjson("./owed.json", owed)   
 
 def idme(bot, update):
     update.message.reply_text("Your ID is: " + str(update.message.from_user.id))
 
 # LINK FUNCTIONS
 
-updater.dispatcher.add_handler(CommandHandler("start", start))
-updater.dispatcher.add_handler(CommandHandler("help", help))
-updater.dispatcher.add_handler(CommandHandler("clear", clear, pass_args=True))
-updater.dispatcher.add_handler(CommandHandler("owe", owe, pass_args=True))
-updater.dispatcher.add_handler(CommandHandler("owes", owes, pass_args=True))
-updater.dispatcher.add_handler(CommandHandler("idme", idme))
+dispatcher.add_handler(CommandHandler("start", start))
+dispatcher.add_handler(CommandHandler("help", help))
+dispatcher.add_handler(CommandHandler("clear", clear, pass_args=True))
+dispatcher.add_handler(CommandHandler("owe", owe, pass_args=True))
+dispatcher.add_handler(CommandHandler("owes", owes, pass_args=True))
+dispatcher.add_handler(CommandHandler("idme", idme))
 
 updater.start_polling()
 updater.idle()

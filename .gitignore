@@ -3,3 +3,6 @@
 
 # ignore personal settings (with key)
 FinanceBot.ini
+
+# ignore compiled python files
+*.pyc
