@@ -18,6 +18,7 @@ msgListMoneyOwed = "Here is a list of people owing money:\n"
 msgNoDebts = "Wow... there are no debts here!"
 msgAllDebtsCleared = "All debts cleared!"
 msgAllDebtsClearedTerm = msgAllDebtsCleared + " A backup file can be found in bckp.json."
+msgIpAddress = "The bot's IP address is: "
 
 # error strings
 errNoFile = "Either file is missing or is not readable. Creating."
@@ -26,3 +27,5 @@ errNotInt = "You gave me an invalid sum! Please only use numbers/decimals (ie, d
 errNotAdmin = "You are not admin! You can't run this command."
 errNoOwer = "There is no-one here with this name: "
 errAllName = "\"all\" cannot be used as a name!"
+errUnknown = "An error has occured."
+errTimeout = "A timeout error has occured."

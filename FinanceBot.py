@@ -10,6 +10,10 @@ import strings
 import subprocess
 
 # INITIALISE
+logging.basicConfig(
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        level=logging.INFO)
+
 config = configparser.ConfigParser()
 config.read("FinanceBot.ini")
 
@@ -22,14 +26,9 @@ currency = config["SETTINGS"]["currency_code"]
 updater = Updater(config["KEYS"]["BOT_API_KEY"])
 dispatcher = updater.dispatcher
 
-logging.basicConfig(
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        level=logging.INFO)
-
-logger = logging.getLogger(__name__)
-
 def error(bot, update, error):
     logger.warn('Update "%s" caused error "%s"' % (update, error))
+    update.message.reply_text(strings.errUnknown)
 
 def __repr__(self):
     return str(self)
@@ -172,10 +171,15 @@ def idme(bot, update):
 def getBotIp(bot, update):
     sender = update.message.from_user
     if sender.id == owner_ID:
-        update.message.reply_text("The bot's IP address is: " \
-                + subprocess.check_output(["curl", "ipinfo.io/ip"],
-                                          universal_newlines=True,
-                                          timeout=5))
+        msgToSend = ""
+        try: 
+            ip_string = subprocess.check_output(["curl", "ipinfo.io/ip"],
+                                                 universal_newlines=True,
+                                                 timeout=5)
+            msgToSend = strings.msgIpAddress + ip_string
+        except CalledProcessError: msgToSend = strings.errUnknown
+        except TimeoutExpired: msgToSend = strings.errTimeout 
+        update.message.reply_text(msgToSend)
 
 # LINK FUNCTIONS
 
