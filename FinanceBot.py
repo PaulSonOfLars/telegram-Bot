@@ -74,6 +74,9 @@ def clear(bot, update, args):
     chat_id = str(update.message.chat_id)
     sender = update.message.from_user
     
+    try: owed[chat_id]
+    except KeyError: owed[chat_id] = {}
+    
     if sender.id != owner_ID:
         update.message.reply_text(strings.errNotAdmin)
         print ("User " + sender.username + " tried to issue an owner command.")
@@ -117,15 +120,8 @@ def owes(bot, update, args):
     owed = helper.loadjson("./owed.json", "owed.json")
     chat_id = str(update.message.chat_id)
     
-    try: owed
-    except NameError: 
-        owed = {}
-        print("Got empty err. Creating...")
-    
     try: owed[chat_id]
-    except KeyError: 
-        owed[chat_id] = {}
-        print ("No key found. Creating...")
+    except KeyError: owed[chat_id] = {}
     
     if len(args) == 3:
         
@@ -181,6 +177,40 @@ def getBotIp(bot, update):
         except TimeoutExpired: msgToSend = strings.errTimeout 
         update.message.reply_text(msgToSend)
 
+def saveNote(bot, update, args):
+    notes = helper.loadjson("./notes.json", "notes.json")
+    chat_id = str(update.message.chat_id)
+    
+    try: notes[chat_id]
+    except KeyError: notes[chat_id] = {}
+
+    if len(args) >= 2:
+        # add note to note repo
+        notename = args[0]
+        del args[0]
+        noteData = " ".join(args)
+        notes[chat_id][notename]= noteData
+        print("Added new note \"" + notename + "\" with content \"" + noteData + "\"." )
+
+    helper.dumpjson("./notes.json", notes)
+
+
+def getNote(bot, update, args):
+    notes = helper.loadjson("./notes.json", "notes.json")
+    chat_id = str(update.message.chat_id)
+   
+    try: notes[chat_id]
+    except KeyError: notes[chat_id] = {}
+    
+    if len(args) == 1:
+        msg = ""
+        try: 
+            msg = notes[chat_id][args[0]]
+            
+        except KeyError:
+            msg = strings.errNoNoteFound + args[0]
+        
+        update.message.reply_text(msg)
 
 # LINK FUNCTIONS
 
@@ -192,6 +222,9 @@ dispatcher.add_handler(CommandHandler("owes", owes, pass_args=True))
 dispatcher.add_handler(CommandHandler("idme", idme))
 dispatcher.add_handler(CommandHandler("botip", getBotIp))
 dispatcher.add_handler(CommandHandler("idme", idme))
+dispatcher.add_handler(CommandHandler("save", saveNote, pass_args=True))
+dispatcher.add_handler(CommandHandler("get", getNote, pass_args=True))
+
 
 updater.start_polling()
 updater.idle()
