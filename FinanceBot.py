@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from telegram.ext import Updater, CommandHandler
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
 import configparser
 import json
@@ -212,6 +212,10 @@ def getNote(bot, update, args):
         
         update.message.reply_text(msg)
 
+def unknown(bot, update):
+    update.message.reply_text(strings.errUnknownCommand)
+
+
 # LINK FUNCTIONS
 
 dispatcher.add_handler(CommandHandler("start", start))
@@ -225,6 +229,7 @@ dispatcher.add_handler(CommandHandler("idme", idme))
 dispatcher.add_handler(CommandHandler("save", saveNote, pass_args=True))
 dispatcher.add_handler(CommandHandler("get", getNote, pass_args=True))
 
+dispatcher.add_handler(MessageHandler(Filters.command, unknown))
 
 updater.start_polling()
 updater.idle()
