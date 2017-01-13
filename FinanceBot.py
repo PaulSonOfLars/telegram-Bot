@@ -181,6 +181,7 @@ def getBotIp(bot, update):
         except TimeoutExpired: msgToSend = strings.errTimeout 
         update.message.reply_text(msgToSend)
 
+
 # LINK FUNCTIONS
 
 dispatcher.add_handler(CommandHandler("start", start))
