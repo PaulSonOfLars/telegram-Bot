@@ -11,7 +11,10 @@ current commands are:
 - /clear `all` clears the entire database of owed money.
 - /clear <ower> `all` clears everything the ower owes.
 - /clear <ower> <owee> clears the debt of ower towards owee.
-- /idme returns your telegram ID."""
+- /idme returns your telegram ID.
+
+Note: some commands are WIP and so aren't shown here. Feel free to use them,\
+but keep in mind they might change in the future."""
 msgStart = "This is FinanceBot! He can help you take care of your house finances. Use /help for more info."
 msgNoMoneyOwed = "Lucky... that person doesn't owe anything!"
 msgListMoneyOwed = "Here is a list of people owing money:\n"

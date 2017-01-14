@@ -10,6 +10,7 @@ import strings
 import subprocess
 
 # INITIALISE
+
 logging.basicConfig(
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
         level=logging.INFO)
@@ -190,7 +191,10 @@ def saveNote(bot, update, args):
         del args[0]
         noteData = " ".join(args)
         notes[chat_id][notename]= noteData
-        print("Added new note \"" + notename + "\" with content \"" + noteData + "\"." )
+        print("Added new note \"" + notename + "\" with content \"" \
+                + noteData + "\"." )
+    else:
+        update.message.reply_text(strings.errBadFormat)
 
     helper.dumpjson("./notes.json", notes)
 
@@ -211,6 +215,21 @@ def getNote(bot, update, args):
             msg = strings.errNoNoteFound + args[0]
         
         update.message.reply_text(msg)
+    else: 
+        update.message.reply_text(strings.errBadFormat)
+
+def allNotes(bot, update, args):
+    notes = helper.loadjson("./notes.json", "notes.json")
+    chat_id = str(update.message.chat_id)
+
+    try: notes[chat_id]
+    except KeyError: notes[chat_id] = {}
+
+    msg = "These are the notes I have saved for this chat: \n"
+    for note in notes[chat_id]:
+        msg += "\n" + note
+
+    update.message.reply_text(msg)
 
 def unknown(bot, update):
     update.message.reply_text(strings.errUnknownCommand)
@@ -228,6 +247,8 @@ dispatcher.add_handler(CommandHandler("botip", getBotIp))
 dispatcher.add_handler(CommandHandler("idme", idme))
 dispatcher.add_handler(CommandHandler("save", saveNote, pass_args=True))
 dispatcher.add_handler(CommandHandler("get", getNote, pass_args=True))
+dispatcher.add_handler(CommandHandler("note", allNotes, pass_args=True))
+
 
 dispatcher.add_handler(MessageHandler(Filters.command, unknown))
 
