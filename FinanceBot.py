@@ -67,6 +67,8 @@ def owe(bot, update, args):
             res = helper.print_owed(owed, chat_id, args[0], res, currency)
         except KeyError:
             res = args[0] + " has no debts!"
+    else:
+        res = strings.errBadFormat
     update.message.reply_text(res)
 
 
@@ -218,6 +220,7 @@ def getNote(bot, update, args):
     else: 
         update.message.reply_text(strings.errBadFormat)
 
+
 def allNotes(bot, update, args):
     notes = helper.loadjson("./notes.json", "notes.json")
     chat_id = str(update.message.chat_id)
@@ -230,6 +233,7 @@ def allNotes(bot, update, args):
         msg += "\n" + note
 
     update.message.reply_text(msg)
+
 
 def unknown(bot, update):
     update.message.reply_text(strings.errUnknownCommand)
