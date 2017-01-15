@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, CommandHandler, MessageHandler, CallbackQueryHandler, InlineQueryHandler, Filters
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 import logging
 import configparser
 import json
@@ -239,6 +240,64 @@ def unknown(bot, update):
     update.message.reply_text(strings.errUnknownCommand)
 
 
+def inlineOwe(bot,update):
+    owed = helper.loadjson("./owed.json", "owed.json")
+    chat_id = str(update.message.chat_id)
+    
+    try:
+        keyboard = makeKeyboard(owed[chat_id].keys(), "owers")
+        reply = InlineKeyboardMarkup(keyboard)
+        update.message.reply_text("here are the people owed money to:",
+                                  reply_markup=reply)
+    except KeyError:
+        update.message.reply_text(strings.msgNoDebts)
+
+
+def makeKeyboard(data, callbackCode):
+    colN = 3
+    counter = 0
+    keyboard=[]
+    for elem in data:
+        if counter%colN == 0:
+            keyboard.append([])
+        keyboard[counter//colN].append(InlineKeyboardButton(
+                                            elem, 
+                                            callback_data=callbackCode + elem))
+        counter += 1
+
+    return keyboard
+
+def button(bot, update):
+    query = update.callback_query
+    chat_id = str(query.message.chat_id)
+    
+    messageHere ="Error. Message not set after button call."
+    reply_markup = None
+    
+    if query.data.startswith("owers"):
+        ower = query.data[5:]
+        owed = helper.loadjson("./owed.json", "owed.json")
+        keyboard = makeKeyboard(owed[chat_id][ower], "owees") 
+        
+        messageHere = ower + " owes money to these people:"
+        reply_markup = InlineKeyboardMarkup(keyboard)
+
+    elif query.data.startswith("owees"):
+        owed = helper.loadjson("./owed.json", "owed.json")
+        ower = query.message.text.split(" ",1)[0]
+        owee = query.data[5:]
+        
+        messageHere = ower + " owes " + owee + " " + currency \
+                        + str(owed[chat_id][ower][owee])
+    
+    else:
+        messageHere = "unrecognised callback code"
+    
+    bot.editMessageText(text=messageHere, 
+                        chat_id=query.message.chat_id,
+                        message_id=query.message.message_id,
+                        reply_markup=reply_markup)
+    
 # LINK FUNCTIONS
 
 dispatcher.add_handler(CommandHandler("start", start))
@@ -252,7 +311,10 @@ dispatcher.add_handler(CommandHandler("idme", idme))
 dispatcher.add_handler(CommandHandler("save", saveNote, pass_args=True))
 dispatcher.add_handler(CommandHandler("get", getNote, pass_args=True))
 dispatcher.add_handler(CommandHandler("note", allNotes, pass_args=True))
+dispatcher.add_handler(CommandHandler("iowe", inlineOwe))
 
+
+dispatcher.add_handler(CallbackQueryHandler(button))
 
 dispatcher.add_handler(MessageHandler(Filters.command, unknown))
 
