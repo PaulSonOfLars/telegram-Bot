@@ -17,8 +17,7 @@ def dumpjson(filename, var):
 
 def print_owed(owed, chat_id, ower, res, currency):
     for owee in owed[chat_id][ower]:
-        val = owed[chat_id][ower][owee]
-        res += "\n" + ower + " owes " + owee + " " + currency + str(val)
-    
-    return res
+        amount = owed[chat_id][ower][owee]
+        res += "\n" + ower + " owes " + owee + " " + currency + str(amount)
 
+    return res
