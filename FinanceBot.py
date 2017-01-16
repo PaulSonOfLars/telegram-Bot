@@ -40,7 +40,7 @@ def help(bot, update):
 
 
 def owe(bot, update, args):
-    owed = helper.loadjson("./data/owed.json")
+    owed = helper.loadjson(strings.loc_owedjson)
     chat_id = str(update.message.chat_id)
 
     try: owed[chat_id]
@@ -57,8 +57,7 @@ def owe(bot, update, args):
 
     elif len(args) == 1:
         try:
-            res = "Here is a list of everyone " + args[0] \
-                  + " owes money to: \n"
+            res = strings.msgListMoneyOwedIndiv.format(args[0])
             res = helper.print_owed(owed, chat_id, args[0], res, currency)
         except KeyError:
             res = args[0] + " has no debts!"
@@ -68,7 +67,7 @@ def owe(bot, update, args):
 
 
 def clear(bot, update, args):
-    owed = helper.loadjson("./data/owed.json")
+    owed = helper.loadjson(strings.loc_owedjson)
     chat_id = str(update.message.chat_id)
     sender = update.message.from_user
 
@@ -77,11 +76,11 @@ def clear(bot, update, args):
 
     if sender.id != owner_ID:
         update.message.reply_text(strings.errNotAdmin)
-        print ("User " + sender.username + " tried to issue an owner command.")
+        print (strings.errUnauthCommand.format(sender.username))
         return
 
     if len(args) == 1 and args[0] == "all":
-            helper.dumpjson("./data/bckp.json", owed)
+            helper.dumpjson(strings.loc_bckpjson, owed)
             owed.pop(chat_id)
             update.message.reply_text(strings.msgAllDebtsCleared)
             print(strings.msgAllDebtsClearedTerm)
@@ -94,13 +93,12 @@ def clear(bot, update, args):
 
         if args[1] == "all":
             owed[chat_id].pop(args[0])
-            print(args[0] + " had all debts cleared by the owner.")
+            print(strings.msgDebtsOfCleared.format(args[0]))
 
         else:
             owed[chat_id][args[0]].pop(args[1])
-            update.message.reply_text(args[0] + "'s debts to " \
-                                      + args[1] + " were cleared.")
-            print(args[0] + " had debts to " + args[1] + " cleared by owner.")
+            update.message.reply_text(msgDebtsOfToCleared.format(args[0],
+                                                                 args[1]))
 
             # remove from database if no debts
             if owed[chat_id] == {}:
@@ -111,7 +109,7 @@ def clear(bot, update, args):
     else:
         update.message.reply_text(strings.errBadFormat)
 
-    helper.dumpjson("./data/owed.json", owed)
+    helper.dumpjson(strings.loc_owedjson, owed)
 
 
 def owesHelper(owed, chat_id, ower, owee, amount):
@@ -141,7 +139,7 @@ def owesHelper(owed, chat_id, ower, owee, amount):
 
 
 def owes(bot, update, args):
-    owed = helper.loadjson("./data/owed.json")
+    owed = helper.loadjson(strings.loc_owedjson)
     chat_id = str(update.message.chat_id)
 
     if len(args) == 3:
@@ -156,7 +154,7 @@ def owes(bot, update, args):
     else:
         update.message.reply_text(strings.errBadFormat)
 
-    helper.dumpjson("./data/owed.json", owed)
+    helper.dumpjson(strings.loc_owedjson, owed)
 
 
 def idme(bot, update):
@@ -179,7 +177,7 @@ def getBotIp(bot, update):
 
 
 def saveNote(bot, update, args):
-    notes = helper.loadjson("./data/notes.json")
+    notes = helper.loadjson(strings.loc_notesjson)
     chat_id = str(update.message.chat_id)
 
     try: notes[chat_id]
@@ -196,11 +194,11 @@ def saveNote(bot, update, args):
     else:
         update.message.reply_text(strings.errBadFormat)
 
-    helper.dumpjson("./data/notes.json", notes)
+    helper.dumpjson(strings.loc_notesjson, notes)
 
 
 def getNote(bot, update, args):
-    notes = helper.loadjson("./data/notes.json")
+    notes = helper.loadjson(strings.loc_notesjson)
     chat_id = str(update.message.chat_id)
 
     try: notes[chat_id]
@@ -220,7 +218,7 @@ def getNote(bot, update, args):
 
 
 def allNotes(bot, update, args):
-    notes = helper.loadjson("./data/notes.json")
+    notes = helper.loadjson(strings.loc_notesjson)
     chat_id = str(update.message.chat_id)
 
     print(notes)
@@ -229,7 +227,7 @@ def allNotes(bot, update, args):
     except KeyError: notes[chat_id] = {}
     msg = "No notes in this chat."
     if len(notes[chat_id]) > 0:
-        msg = "These are the notes I have saved for this chat: \n"
+        msg = strings.msgNotesForChat
         for note in notes[chat_id]:
             msg += "\n" + note
 
@@ -238,7 +236,8 @@ def allNotes(bot, update, args):
 
 def unknown(bot, update, user_data):
     if update.message.text == "/iowes" :
-        user_data.clear()
+        user_data.pop("ower")
+        user_data.pop("owee")
         update.message.reply_text(strings.errCommandStillRunning)
         return ConversationHandler.END
     else:
@@ -246,30 +245,30 @@ def unknown(bot, update, user_data):
 
 
 def inlineOwe(bot,update):
-    owed = helper.loadjson("./data/owed.json")
+    owed = helper.loadjson(strings.loc_owedjson)
     chat_id = str(update.message.chat_id)
 
     try:
         keyboard = helper.makeKeyboard(owed[chat_id].keys(), "owers")
         reply = InlineKeyboardMarkup(keyboard)
-        update.message.reply_text("here are the people who owe money:",
+        update.message.reply_text(strings.msgListMoneyOwed,
                                   reply_markup=reply)
     except KeyError:
         update.message.reply_text(strings.msgNoDebts)
 
 
 def cancel(bot,update, user_data):
-    user_data.clear()
+    user_data.pop("ower")
+    user_data.pop("owee")
     update.message.reply_text("Command cancelled",
                               reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
 
 
 def create_ower(bot, update, user_data):
-    owername = update.message.text
-    user_data["ower"] = owername
-    update.message.reply_text(owername + " was saved as a new ower. Please" \
-                              + "input a new owee for this ower.")
+    ower = update.message.text
+    user_data["ower"] = ower
+    update.message.reply_text(strings.msgNewOwer.format(ower, ower))
     return OWEE
 
 
@@ -277,14 +276,12 @@ def create_owee(bot, update, user_data):
     owee = update.message.text
     ower = user_data["ower"]
     user_data["owee"] = owee
-    update.message.reply_text(owee + " was saved as a new owee for user " \
-                              + ower + ". How much does " + ower + " owe " \
-                              + owee + "? Please type a number.")
+    update.message.reply_text(strings.msgNewOwee.format(owee,ower,ower,owee))
     return AMOUNT
 
 
 def amount(bot,update, user_data):
-    owed = helper.loadjson("./data/owed.json")
+    owed = helper.loadjson(strings.loc_owedjson)
     chat_id = str(update.message.chat_id)
     ower = user_data["ower"]
     owee = user_data["owee"]
@@ -296,27 +293,25 @@ def amount(bot,update, user_data):
 
     update.message.reply_text(msg)
 
-    helper.dumpjson("./data/owed.json", owed)
+    helper.dumpjson(strings.loc_owedjson, owed)
     user_data.clear()
     return ConversationHandler.END
 
 
 def inlineOwes(bot,update, user_data):
-    owed = helper.loadjson("./data/owed.json")
+    owed = helper.loadjson(strings.loc_owedjson)
     chat_id = str(update.message.chat_id)
     try: keyboard = helper.makeKeyboard(owed[chat_id].keys(), "")
     except KeyError: keyboard = []
 
     reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text("Here is the current list of people who owe " \
-                              + "money. Please select one, or reply with a " \
-                              + "new name to add a new ower.",
+    update.message.reply_text(strings.msgCurrentOwers,
                               reply_markup=reply_markup)
     return OWER
 
 
 def ower_button(bot, update, user_data):
-    owed = helper.loadjson("./data/owed.json")
+    owed = helper.loadjson(strings.loc_owedjson)
     query = update.callback_query
     chat_id = str(query.message.chat_id)
     ower = query.data # this is the name pressed
@@ -326,8 +321,7 @@ def ower_button(bot, update, user_data):
     except KeyError: keyboard = []
 
     reply = InlineKeyboardMarkup(keyboard)
-    bot.editMessageText(text="Who does " + ower + " owe money to? type in a" \
-                             + "new name to add a new owee.",
+    bot.editMessageText(text=msgWhoOwedTo.format(ower),
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id,
                         reply_markup=reply)
@@ -336,46 +330,46 @@ def ower_button(bot, update, user_data):
 
 
 def owee_button(bot, update, user_data):
-    owed = helper.loadjson("./data/owed.json")
+    owed = helper.loadjson(strings.loc_owedjson)
     query = update.callback_query
     chat_id = str(query.message.chat_id)
     ower = user_data["ower"]
     owee = query.data # this is the name pressed
     user_data["owee"] = owee
 
-    bot.editMessageText(text="How much money does " + ower + " owe to " \
-                              + owee + "? Please type number.",
+    bot.editMessageText(text=strings.msgHowMuch.format(ower,owee),
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id)
 
     return AMOUNT
 
 
-def button(bot, update):
+def button(bot, update, user_data):
     query = update.callback_query
     chat_id = str(query.message.chat_id)
 
-    messageHere ="Error. Message not set after button call."
+    messageHere = strings.errButtonMsg
     reply_markup = None
 
     if query.data.startswith("owers"):
         ower = query.data[5:]
-        owed = helper.loadjson("./data/owed.json")
-        keyboard = helper.makeKeyboard(owed[chat_id][ower], "owees")
+        user_data["oweower"] = ower
+        owed = helper.loadjson(strings.loc_owedjson)
+        keyboard = helper.makeKeyboard(owed[chat_id][ower].keys(), "owees")
 
-        messageHere = ower + " owes money to these people:"
+        messageHere = strings.msgListMoneyOwedIndiv.format(ower)
         reply_markup = InlineKeyboardMarkup(keyboard)
 
     elif query.data.startswith("owees"):
-        owed = helper.loadjson("./data/owed.json")
-        ower = query.message.text.split(" ",1)[0]
+        owed = helper.loadjson(strings.loc_owedjson)
+        ower = user_data["oweower"]
         owee = query.data[5:]
 
         messageHere = ower + " owes " + owee + " " + currency \
                         + str(owed[chat_id][ower][owee])
-
+        user_data.pop("oweower") # cleanup
     else:
-        messageHere = "unrecognised callback code"
+        messageHere = strings.errUnknownCallback
 
     bot.editMessageText(text=messageHere,
                         chat_id=query.message.chat_id,
@@ -449,7 +443,7 @@ def main():
     dispatcher.add_handler(iowes_ConversationHandler)
 
 
-    dispatcher.add_handler(CallbackQueryHandler(button))
+    dispatcher.add_handler(CallbackQueryHandler(button, pass_user_data=True))
 
     #unknown commands, leave last.
     dispatcher.add_handler(MessageHandler(Filters.command,

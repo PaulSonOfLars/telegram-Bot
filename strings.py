@@ -16,12 +16,33 @@ current commands are:
 Note: some commands are WIP and so aren't shown here. Feel free to use them,\
 but keep in mind they might change in the future."""
 msgStart = "This is FinanceBot! He can help you take care of your house finances. Use /help for more info."
+
 msgNoMoneyOwed = "Lucky... that person doesn't owe anything!"
 msgListMoneyOwed = "Here is a list of people owing money:\n"
+msgListMoneyOwedIndiv = "Here is a list of everyone {} owes money to: \n"
+
+msgHowMuch = "How much does {} owe {}? Please type a number."
+msgNewOwer = "{} was saved as a new ower. Please input the name of the person that {} owes money to."
+msgNewOwee = "{} was saved as a new owee for {}." + msgHowMuch
+msgCurrentOwers = "Here is the current list of people who owe money. Please select one, or reply with a new name to add a new ower."
+msgWhoOwedTo = "Who does {} owe money to? Type in a new name to add a new owee."
+
 msgNoDebts = "Wow... there are no debts here!"
 msgAllDebtsCleared = "All debts cleared!"
 msgAllDebtsClearedTerm = msgAllDebtsCleared + " A backup file can be found in bckp.json."
+msgDebtsOfCleared = "{} had all debts cleared by the owner."
+msgDebtsOfToCleared = "{}'s debts to {} were cleared."
+
 msgIpAddress = "The bot's IP address is: "
+
+msgNotesForChat = "These are the notes i have saved for this chat: \n"
+
+
+# file locations
+loc_owedjson = "./data/owed.json"
+loc_bckpjson = "./data/bckp.json"
+loc_notesjson = "./data/notes.json"
+
 
 # error strings
 errNoFile = "Either file is missing or is not readable. Creating."
@@ -35,3 +56,6 @@ errTimeout = "A timeout error has occured."
 errNoNoteFound = "No note found by the name of "
 errUnknownCommand = "Hey, I haven't been taught how that command works yet!"
 errCommandStillRunning = "Sorry, I realised I was still running that. Please try again, it should work!"
+errUnauthCommand = "User {} tried to issue an owner command."
+errButtonMsg = "Error. Message not set after button call."
+errUnknownCallback = "Err: unrecognised callback code."

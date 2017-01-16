@@ -34,6 +34,7 @@ def makeKeyboard(data, callbackCode):
     for elem in data:
         if counter%colN == 0:
             keyboard.append([])
+
         keyboard[counter//colN].append(InlineKeyboardButton(
                                             elem,
                                             callback_data=callbackCode + elem))
