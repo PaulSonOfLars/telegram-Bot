@@ -81,7 +81,7 @@ def clear(bot, update, args):
         return
 
     if len(args) == 1 and args[0] == "all":
-            helper.dumpjson("./bckp.json", owed)
+            helper.dumpjson("./data/bckp.json", owed)
             owed.pop(chat_id)
             update.message.reply_text(strings.msgAllDebtsCleared)
             print(strings.msgAllDebtsClearedTerm)
@@ -179,7 +179,7 @@ def getBotIp(bot, update):
 
 
 def saveNote(bot, update, args):
-    notes = helper.loadjson("./data/notes.jsonn")
+    notes = helper.loadjson("./data/notes.json")
     chat_id = str(update.message.chat_id)
 
     try: notes[chat_id]
@@ -196,11 +196,11 @@ def saveNote(bot, update, args):
     else:
         update.message.reply_text(strings.errBadFormat)
 
-    helper.dumpjson("./notes.json", notes)
+    helper.dumpjson("./data/notes.json", notes)
 
 
 def getNote(bot, update, args):
-    notes = helper.loadjson("./data/notes.jsonn")
+    notes = helper.loadjson("./data/notes.json")
     chat_id = str(update.message.chat_id)
 
     try: notes[chat_id]
@@ -220,15 +220,18 @@ def getNote(bot, update, args):
 
 
 def allNotes(bot, update, args):
-    notes = helper.loadjson("./data/notes.jsonn")
+    notes = helper.loadjson("./data/notes.json")
     chat_id = str(update.message.chat_id)
+
+    print(notes)
 
     try: notes[chat_id]
     except KeyError: notes[chat_id] = {}
-
-    msg = "These are the notes I have saved for this chat: \n"
-    for note in notes[chat_id]:
-        msg += "\n" + note
+    msg = "No notes in this chat."
+    if len(notes[chat_id]) > 0:
+        msg = "These are the notes I have saved for this chat: \n"
+        for note in notes[chat_id]:
+            msg += "\n" + note
 
     update.message.reply_text(msg)
 
@@ -247,7 +250,7 @@ def inlineOwe(bot,update):
     chat_id = str(update.message.chat_id)
 
     try:
-        keyboard = makeKeyboard(owed[chat_id].keys(), "owers")
+        keyboard = helper.makeKeyboard(owed[chat_id].keys(), "owers")
         reply = InlineKeyboardMarkup(keyboard)
         update.message.reply_text("here are the people who owe money:",
                                   reply_markup=reply)
@@ -297,10 +300,11 @@ def amount(bot,update, user_data):
     user_data.clear()
     return ConversationHandler.END
 
+
 def inlineOwes(bot,update, user_data):
     owed = helper.loadjson("./data/owed.json")
     chat_id = str(update.message.chat_id)
-    try: keyboard = makeKeyboard(owed[chat_id].keys(), "")
+    try: keyboard = helper.makeKeyboard(owed[chat_id].keys(), "")
     except KeyError: keyboard = []
 
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -311,20 +315,6 @@ def inlineOwes(bot,update, user_data):
     return OWER
 
 
-def makeKeyboard(data, callbackCode):
-    colN = 3
-    counter = 0
-    keyboard=[]
-    for elem in data:
-        if counter%colN == 0:
-            keyboard.append([])
-        keyboard[counter//colN].append(InlineKeyboardButton(
-                                            elem,
-                                            callback_data=callbackCode + elem))
-        counter += 1
-
-    return keyboard
-
 def ower_button(bot, update, user_data):
     owed = helper.loadjson("./data/owed.json")
     query = update.callback_query
@@ -332,7 +322,7 @@ def ower_button(bot, update, user_data):
     ower = query.data # this is the name pressed
     user_data["ower"] = ower
 
-    try: keyboard = makeKeyboard(owed[chat_id][ower].keys(), "")
+    try: keyboard = helper.makeKeyboard(owed[chat_id][ower].keys(), "")
     except KeyError: keyboard = []
 
     reply = InlineKeyboardMarkup(keyboard)
@@ -343,6 +333,7 @@ def ower_button(bot, update, user_data):
                         reply_markup=reply)
 
     return OWEE
+
 
 def owee_button(bot, update, user_data):
     owed = helper.loadjson("./data/owed.json")
@@ -359,6 +350,7 @@ def owee_button(bot, update, user_data):
 
     return AMOUNT
 
+
 def button(bot, update):
     query = update.callback_query
     chat_id = str(query.message.chat_id)
@@ -369,7 +361,7 @@ def button(bot, update):
     if query.data.startswith("owers"):
         ower = query.data[5:]
         owed = helper.loadjson("./data/owed.json")
-        keyboard = makeKeyboard(owed[chat_id][ower], "owees")
+        keyboard = helper.makeKeyboard(owed[chat_id][ower], "owees")
 
         messageHere = ower + " owes money to these people:"
         reply_markup = InlineKeyboardMarkup(keyboard)
