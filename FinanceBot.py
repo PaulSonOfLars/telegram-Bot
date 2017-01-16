@@ -115,34 +115,33 @@ def clear(bot, update, args):
 
 def owesHelper(owed, chat_id, ower, owee, amount):
 
-        try: owed[chat_id][ower]
-        except:
-            owed[chat_id][ower] = {}
-            print("Added new ower: " + ower + ".")
+    try: owed[chat_id]
+    except KeyError: owed[chat_id] = {}
 
-        try: owed[chat_id][ower][owee]
-        except:
-            owed[chat_id][ower][owee] = 0
-            print("Added new owee for ower " + ower + ".")
+    try: owed[chat_id][ower]
+    except:
+        owed[chat_id][ower] = {}
+        print("Added new ower: " + ower + ".")
 
-        owed[chat_id][ower][owee] += float(amount)
+    try: owed[chat_id][ower][owee]
+    except:
+        owed[chat_id][ower][owee] = 0
+        print("Added new owee for ower " + ower + ".")
 
-        # check whether owed sum is now 0 and removes if necessary
-        # also this makes a nice shape if you have tabs = 4
-        if owed[chat_id][ower][owee] == 0:
-            owed[chat_id][ower].pop(owee)
-            if owed[chat_id][ower] == {}:
-                owed[chat_id].pop(ower)
-                if owed[chat_id] == {}:
-                    owed.pop(chat_id)
+    owed[chat_id][ower][owee] += float(amount)
+
+    # check whether owed sum is now 0 and removes if necessary
+    if owed[chat_id][ower][owee] == 0:
+        owed[chat_id][ower].pop(owee)
+        if owed[chat_id][ower] == {}:
+            owed[chat_id].pop(ower)
+            if owed[chat_id] == {}:
+                owed.pop(chat_id)
 
 
 def owes(bot, update, args):
     owed = helper.loadjson("./owed.json", "owed.json")
     chat_id = str(update.message.chat_id)
-
-    try: owed[chat_id]
-    except KeyError: owed[chat_id] = {}
 
     if len(args) == 3:
 
@@ -265,8 +264,8 @@ def cancel(bot,update, user_data):
 def create_ower(bot, update, user_data):
     owername = update.message.text
     user_data["ower"] = owername
-    update.message.reply_text(owername + " was saved as a new ower. Please \
-                              input a new owee for this ower.")
+    update.message.reply_text(owername + " was saved as a new ower. Please" \
+                              + "input a new owee for this ower.")
     return OWEE
 
 
@@ -303,10 +302,11 @@ def inlineOwes(bot,update, user_data):
     try: keyboard = makeKeyboard(owed[chat_id].keys(), "")
     except KeyError: keyboard = []
 
-    reply = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text("Here is the current list of people who owe \
-                              money. Please select one, or reply with a new \
-                              name to add a new ower.", reply_markup=reply)
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    update.message.reply_text("Here is the current list of people who owe " \
+                              + "money. Please select one, or reply with a " \
+                              + "new name to add a new ower.",
+                              reply_markup=reply_markup)
     return OWER
 
 
@@ -335,8 +335,8 @@ def ower_button(bot, update, user_data):
     except KeyError: keyboard = []
 
     reply = InlineKeyboardMarkup(keyboard)
-    bot.editMessageText(text="Who does " + ower + " owe money to? type in a \
-                             new name to add a new owee.",
+    bot.editMessageText(text="Who does " + ower + " owe money to? type in a" \
+                             + "new name to add a new owee.",
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id,
                         reply_markup=reply)
