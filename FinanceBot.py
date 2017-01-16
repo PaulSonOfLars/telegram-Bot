@@ -9,6 +9,7 @@ import json
 import helper
 import strings
 import subprocess
+import os
 
 # INITIALISE
 
@@ -39,7 +40,7 @@ def help(bot, update):
 
 
 def owe(bot, update, args):
-    owed = helper.loadjson("./owed.json", "owed.json")
+    owed = helper.loadjson("./data/owed.json")
     chat_id = str(update.message.chat_id)
 
     try: owed[chat_id]
@@ -67,7 +68,7 @@ def owe(bot, update, args):
 
 
 def clear(bot, update, args):
-    owed = helper.loadjson("./owed.json", "owed.json")
+    owed = helper.loadjson("./data/owed.json")
     chat_id = str(update.message.chat_id)
     sender = update.message.from_user
 
@@ -110,7 +111,7 @@ def clear(bot, update, args):
     else:
         update.message.reply_text(strings.errBadFormat)
 
-    helper.dumpjson("./owed.json", owed)
+    helper.dumpjson("./data/owed.json", owed)
 
 
 def owesHelper(owed, chat_id, ower, owee, amount):
@@ -140,7 +141,7 @@ def owesHelper(owed, chat_id, ower, owee, amount):
 
 
 def owes(bot, update, args):
-    owed = helper.loadjson("./owed.json", "owed.json")
+    owed = helper.loadjson("./data/owed.json")
     chat_id = str(update.message.chat_id)
 
     if len(args) == 3:
@@ -155,7 +156,7 @@ def owes(bot, update, args):
     else:
         update.message.reply_text(strings.errBadFormat)
 
-    helper.dumpjson("./owed.json", owed)
+    helper.dumpjson("./data/owed.json", owed)
 
 
 def idme(bot, update):
@@ -178,7 +179,7 @@ def getBotIp(bot, update):
 
 
 def saveNote(bot, update, args):
-    notes = helper.loadjson("./notes.json", "notes.json")
+    notes = helper.loadjson("./data/notes.jsonn")
     chat_id = str(update.message.chat_id)
 
     try: notes[chat_id]
@@ -199,7 +200,7 @@ def saveNote(bot, update, args):
 
 
 def getNote(bot, update, args):
-    notes = helper.loadjson("./notes.json", "notes.json")
+    notes = helper.loadjson("./data/notes.jsonn")
     chat_id = str(update.message.chat_id)
 
     try: notes[chat_id]
@@ -219,7 +220,7 @@ def getNote(bot, update, args):
 
 
 def allNotes(bot, update, args):
-    notes = helper.loadjson("./notes.json", "notes.json")
+    notes = helper.loadjson("./data/notes.jsonn")
     chat_id = str(update.message.chat_id)
 
     try: notes[chat_id]
@@ -242,7 +243,7 @@ def unknown(bot, update, user_data):
 
 
 def inlineOwe(bot,update):
-    owed = helper.loadjson("./owed.json", "owed.json")
+    owed = helper.loadjson("./data/owed.json")
     chat_id = str(update.message.chat_id)
 
     try:
@@ -280,7 +281,7 @@ def create_owee(bot, update, user_data):
 
 
 def amount(bot,update, user_data):
-    owed = helper.loadjson("./owed.json", "owed.json")
+    owed = helper.loadjson("./data/owed.json")
     chat_id = str(update.message.chat_id)
     ower = user_data["ower"]
     owee = user_data["owee"]
@@ -292,12 +293,12 @@ def amount(bot,update, user_data):
 
     update.message.reply_text(msg)
 
-    helper.dumpjson("./owed.json", owed)
+    helper.dumpjson("./data/owed.json", owed)
     user_data.clear()
     return ConversationHandler.END
 
 def inlineOwes(bot,update, user_data):
-    owed = helper.loadjson("./owed.json", "owed.json")
+    owed = helper.loadjson("./data/owed.json")
     chat_id = str(update.message.chat_id)
     try: keyboard = makeKeyboard(owed[chat_id].keys(), "")
     except KeyError: keyboard = []
@@ -325,7 +326,7 @@ def makeKeyboard(data, callbackCode):
     return keyboard
 
 def ower_button(bot, update, user_data):
-    owed = helper.loadjson("./owed.json", "owed.json")
+    owed = helper.loadjson("./data/owed.json")
     query = update.callback_query
     chat_id = str(query.message.chat_id)
     ower = query.data # this is the name pressed
@@ -344,7 +345,7 @@ def ower_button(bot, update, user_data):
     return OWEE
 
 def owee_button(bot, update, user_data):
-    owed = helper.loadjson("./owed.json", "owed.json")
+    owed = helper.loadjson("./data/owed.json")
     query = update.callback_query
     chat_id = str(query.message.chat_id)
     ower = user_data["ower"]
@@ -367,14 +368,14 @@ def button(bot, update):
 
     if query.data.startswith("owers"):
         ower = query.data[5:]
-        owed = helper.loadjson("./owed.json", "owed.json")
+        owed = helper.loadjson("./data/owed.json")
         keyboard = makeKeyboard(owed[chat_id][ower], "owees")
 
         messageHere = ower + " owes money to these people:"
         reply_markup = InlineKeyboardMarkup(keyboard)
 
     elif query.data.startswith("owees"):
-        owed = helper.loadjson("./owed.json", "owed.json")
+        owed = helper.loadjson("./data/owed.json")
         ower = query.message.text.split(" ",1)[0]
         owee = query.data[5:]
 
@@ -391,6 +392,13 @@ def button(bot, update):
 
 
 def main():
+    abspath = os.path.abspath(__file__)
+    dname = os.path.dirname(abspath)
+    os.chdir(dname)
+
+    if not os.path.exists("./data/"):
+        os.makedirs("data")
+
     config = configparser.ConfigParser()
     config.read("FinanceBot.ini")
 

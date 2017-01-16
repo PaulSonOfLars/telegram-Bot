@@ -2,12 +2,12 @@ import json
 import os
 import strings
 
-def loadjson(PATH, filename):
+def loadjson(PATH):
     if not os.path.isfile(PATH) or not os.access(PATH, os.R_OK):
         print(strings.errNoFile)
         name = {}
         dumpjson(filename, name)
-    with open(filename) as f:
+    with open(PATH) as f:
         name = json.load(f)
     return name
 
