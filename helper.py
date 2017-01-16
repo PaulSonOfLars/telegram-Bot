@@ -6,7 +6,7 @@ def loadjson(PATH):
     if not os.path.isfile(PATH) or not os.access(PATH, os.R_OK):
         print(strings.errNoFile)
         name = {}
-        dumpjson(filename, name)
+        dumpjson(PATH3, name)
     with open(PATH) as f:
         name = json.load(f)
     return name
