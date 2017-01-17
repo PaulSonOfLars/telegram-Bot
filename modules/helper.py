@@ -1,7 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import json
 import os
-import strings
+from modules import strings
 from telegram import InlineKeyboardButton
+import FinanceBot
 
 
 def loadjson(PATH):
@@ -19,10 +23,10 @@ def dumpjson(filename, var):
         json.dump(var, f)
 
 
-def print_owed(owed, chat_id, ower, res, currency):
+def print_owed(owed, chat_id, ower, res):
     for owee in owed[chat_id][ower]:
         amount = owed[chat_id][ower][owee]
-        res += "\n" + ower + " owes " + owee + " " + currency + str(amount)
+        res += "\n" + ower + " owes " + owee + " " + FinanceBot.currency + str(amount)
 
     return res
 
