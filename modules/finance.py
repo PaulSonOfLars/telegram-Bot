@@ -70,8 +70,8 @@ def clear(bot, update, args):
 
         else:
             owed[chat_id][args[0]].pop(args[1])
-            update.message.reply_text(msgDebtsOfToCleared.format(args[0],
-                                                                 args[1]))
+            update.message.reply_text(
+                strings.msgDebtsOfToCleared.format(args[0], args[1]))
 
             # remove from database if no debts
             if owed[chat_id] == {}:
@@ -94,13 +94,13 @@ def owes_helper(owed, chat_id, ower, owee, amount):
 
     try:
         owed[chat_id][ower]
-    except:
+    except KeyError:
         owed[chat_id][ower] = {}
         print("Added new ower: " + ower + ".")
 
     try:
         owed[chat_id][ower][owee]
-    except:
+    except KeyError:
         owed[chat_id][ower][owee] = 0
         print("Added new owee for ower " + ower + ".")
 
@@ -175,7 +175,7 @@ def create_owee(bot, update, user_data):
     return FinanceBot.AMOUNT
 
 
-def amount(bot, update, user_data):
+def amount_owed(bot, update, user_data):
     owed = helper.loadjson(strings.loc_owedjson)
     chat_id = str(update.message.chat_id)
     ower = user_data["ower"]

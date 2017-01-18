@@ -1,9 +1,19 @@
 #!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
+""" This is the main file for the FinanceBot telegram bot.
+
+Here, the main function is the main element, which adds a series of handlers to
+describe how respond to the input given to the telegram bot by a user.
+
+The bot is then set to wait until input is received.
+
+For ease of use, the bot is split into multiple modules, found in the modules
+directory; this allows modules to be added or removed in a simpler fashion.
+
+"""
 
 import os
 import configparser
-import logging
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from telegram.ext import CallbackQueryHandler
 from telegram.ext import ConversationHandler
@@ -14,32 +24,18 @@ from modules import finance, misc, strings, notes
 CONFIG = configparser.ConfigParser()
 CONFIG.read("FinanceBot.ini")
 
-global OWNER_ID
 OWNER_ID = int(CONFIG["OWNER"]["Telegram_ID"])
 
-global CURRENCY
 CURRENCY = CONFIG["SETTINGS"]["currency_code"]
 
-global KEY
 KEY = CONFIG["KEYS"]["BOT_API_KEY"]
-
-# enable logging
-logging.basicConfig(
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    level=logging.INFO)
-
-LOGGER = logging.getLogger(__name__)
 
 # give numbers for the ConversationHandler buttons used in /iowes
 OWER, OWEE, AMOUNT = range(3)
 
-
-def error(bot, update, error):
-    LOGGER.warning('Update "%s" caused error "%s"' % (update, error))
-    update.message.reply_text(strings.errUnknown)
-
-
 def unknown(bot, update, user_data):
+    """Used to respond to unknown command inputs, and deal with edge cases."""
+
     if update.message.text == "/iowes":
         try:
             user_data.pop("ower")
@@ -55,8 +51,11 @@ def unknown(bot, update, user_data):
     else:
         update.message.reply_text(strings.errUnknownCommand)
 
-
 def main():
+    """ The main section of the file. Checks the data dir, loads the
+    BOT_API_KEY, adds the appropriate handlers, and then awaits input from
+    telegram.
+    """
     abspath = os.path.abspath(__file__)
     dname = os.path.dirname(abspath)
     os.chdir(dname)
@@ -87,7 +86,7 @@ def main():
                                         pass_user_data=True)],
 
             AMOUNT: [MessageHandler(Filters.text,
-                                    finance.amount,
+                                    finance.amount_owed,
                                     pass_user_data=True)]
         },
         fallbacks=[CommandHandler("cancel",
@@ -119,8 +118,6 @@ def main():
     dispatcher.add_handler(MessageHandler(Filters.command,
                                           unknown,
                                           pass_user_data=True))
-
-    dispatcher.add_error_handler(error)
 
     updater.start_polling()
     updater.idle()

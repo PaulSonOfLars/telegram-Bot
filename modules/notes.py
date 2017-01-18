@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 
 from modules import helper, strings
-from telegram.ext import Updater
-
 
 def save_note(bot, update, args):
     notes = helper.loadjson(strings.loc_notesjson)
     chat_id = str(update.message.chat_id)
 
-    try: notes[chat_id]
-    except KeyError: notes[chat_id] = {}
+    try:
+        notes[chat_id]
+    except KeyError:
+        notes[chat_id] = {}
 
     if len(args) >= 2:
         # add note to note repo
@@ -30,8 +30,10 @@ def get_note(bot, update, args):
     notes = helper.loadjson(strings.loc_notesjson)
     chat_id = str(update.message.chat_id)
 
-    try: notes[chat_id]
-    except KeyError: notes[chat_id] = {}
+    try:
+        notes[chat_id]
+    except KeyError:
+        notes[chat_id] = {}
 
     if len(args) == 1:
         msg = ""
@@ -50,8 +52,11 @@ def all_notes(bot, update, args):
     notes = helper.loadjson(strings.loc_notesjson)
     chat_id = str(update.message.chat_id)
 
-    try: notes[chat_id]
-    except KeyError: notes[chat_id] = {}
+    try:
+        notes[chat_id]
+    except KeyError:
+        notes[chat_id] = {}
+
     msg = "No notes in this chat."
     if len(notes[chat_id]) > 0:
         msg = strings.msgNotesForChat
