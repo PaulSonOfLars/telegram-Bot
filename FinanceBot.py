@@ -10,6 +10,7 @@ from telegram.ext import ConversationHandler
 from modules import finance, misc, strings, notes
 
 # initialise globals
+# load config file
 CONFIG = configparser.ConfigParser()
 CONFIG.read("FinanceBot.ini")
 
@@ -29,16 +30,13 @@ logging.basicConfig(
 
 LOGGER = logging.getLogger(__name__)
 
+# give numbers for the ConversationHandler buttons used in /iowes
 OWER, OWEE, AMOUNT = range(3)
 
 
 def error(bot, update, error):
-    LOGGER.warn('Update "%s" caused error "%s"' % (update, error))
+    LOGGER.warning('Update "%s" caused error "%s"' % (update, error))
     update.message.reply_text(strings.errUnknown)
-
-
-def __repr__(self):
-    return str(self)
 
 
 def unknown(bot, update, user_data):
@@ -51,7 +49,7 @@ def unknown(bot, update, user_data):
         update.message.reply_text(strings.errCommandStillRunning)
         return ConversationHandler.END
 
-    else if update.message.text == "/cancel":
+    elif update.message.text == "/cancel":
         update.message.reply_text(strings.errNothingToCancel)
 
     else:
