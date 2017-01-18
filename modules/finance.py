@@ -1,6 +1,12 @@
 #!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
 
+""" This is the finance module, controlling all the money commands.
+
+The data is stored in data/owed.json, which is loaded using some of the helper
+functions.
+"""
+
 from telegram.ext import ConversationHandler
 from telegram import InlineKeyboardMarkup, ReplyKeyboardRemove
 from modules import helper, strings

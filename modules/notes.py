@@ -1,6 +1,11 @@
 #!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
 
+""" This is the note module, taking care of all note related functions.
+
+Note data is found in data/notes.json.
+"""
+
 from modules import helper, strings
 
 def save_note(bot, update, args):

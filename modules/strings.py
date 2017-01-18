@@ -1,8 +1,8 @@
 #!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
 
-# this file declares all strings
-
+""" This file declares all strings
+"""
 # messages
 msgHelp = """Hi! This bot is currently WIP. I'm working on it!
 current commands are:

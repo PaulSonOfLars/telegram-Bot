@@ -1,6 +1,9 @@
 #!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
+""" This is the helper file.
 
+Functions that are commonly used accross multiple modules are found here.
+"""
 import json
 import os
 from modules import strings
