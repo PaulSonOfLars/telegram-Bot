@@ -9,5 +9,5 @@ Telegram_ID=123456789
 Telegram_handle=@blablabla
 
 [SETTINGS]
-# The currency code. 
-currency_code=£
+# The CURRENCY code. 
+CURRENCY_code=£

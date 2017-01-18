@@ -5,7 +5,7 @@ from modules import helper, strings
 from telegram.ext import Updater
 
 
-def saveNote(bot, update, args):
+def save_note(bot, update, args):
     notes = helper.loadjson(strings.loc_notesjson)
     chat_id = str(update.message.chat_id)
 
@@ -16,17 +16,17 @@ def saveNote(bot, update, args):
         # add note to note repo
         notename = args[0]
         del args[0]
-        noteData = " ".join(args)
-        notes[chat_id][notename]= noteData
+        note_data = " ".join(args)
+        notes[chat_id][notename] = note_data
         print("Added new note \"" + notename + "\" with content \"" \
-                + noteData + "\"." )
+                + note_data + "\".")
     else:
         update.message.reply_text(strings.errBadFormat)
 
     helper.dumpjson(strings.loc_notesjson, notes)
 
 
-def getNote(bot, update, args):
+def get_note(bot, update, args):
     notes = helper.loadjson(strings.loc_notesjson)
     chat_id = str(update.message.chat_id)
 
@@ -46,7 +46,7 @@ def getNote(bot, update, args):
         update.message.reply_text(strings.errBadFormat)
 
 
-def allNotes(bot, update, args):
+def all_notes(bot, update, args):
     notes = helper.loadjson(strings.loc_notesjson)
     chat_id = str(update.message.chat_id)
 

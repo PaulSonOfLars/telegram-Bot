@@ -1,9 +1,8 @@
 #!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
 
-import json
-from telegram.ext import Updater
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardRemove
+from telegram.ext import ConversationHandler
+from telegram import InlineKeyboardMarkup, ReplyKeyboardRemove
 from modules import helper, strings
 import FinanceBot
 
@@ -12,8 +11,10 @@ def owe(bot, update, args):
     owed = helper.loadjson(strings.loc_owedjson)
     chat_id = str(update.message.chat_id)
 
-    try: owed[chat_id]
-    except KeyError: owed[chat_id] = {}
+    try:
+        owed[chat_id]
+    except KeyError:
+        owed[chat_id] = {}
 
     res = strings.msgNoDebts
     if len(args) == 0:
@@ -40,22 +41,25 @@ def clear(bot, update, args):
     chat_id = str(update.message.chat_id)
     sender = update.message.from_user
 
-    try: owed[chat_id]
-    except KeyError: owed[chat_id] = {}
+    try:
+        owed[chat_id]
+    except KeyError:
+        owed[chat_id] = {}
 
-    if sender.id != FinanceBot.owner_ID:
+    if sender.id != FinanceBot.OWNER_ID:
         update.message.reply_text(strings.errNotAdmin)
-        print (strings.errUnauthCommand.format(sender.username))
+        print(strings.errUnauthCommand.format(sender.username))
         return
 
     if len(args) == 1 and args[0] == "all":
-            helper.dumpjson(strings.loc_bckpjson, owed)
-            owed.pop(chat_id)
-            update.message.reply_text(strings.msgAllDebtsCleared)
-            print(strings.msgAllDebtsClearedTerm)
+        helper.dumpjson(strings.loc_bckpjson, owed)
+        owed.pop(chat_id)
+        update.message.reply_text(strings.msgAllDebtsCleared)
+        print(strings.msgAllDebtsClearedTerm)
 
     elif len(args) == 2:
-        try: owed[chat_id][args[0]]
+        try:
+            owed[chat_id][args[0]]
         except KeyError:
             update.message.reply_text(strings.errNoOwer + args[0])
             return
@@ -81,17 +85,21 @@ def clear(bot, update, args):
     helper.dumpjson(strings.loc_owedjson, owed)
 
 
-def owesHelper(owed, chat_id, ower, owee, amount):
+def owes_helper(owed, chat_id, ower, owee, amount):
 
-    try: owed[chat_id]
-    except KeyError: owed[chat_id] = {}
+    try:
+        owed[chat_id]
+    except KeyError:
+        owed[chat_id] = {}
 
-    try: owed[chat_id][ower]
+    try:
+        owed[chat_id][ower]
     except:
         owed[chat_id][ower] = {}
         print("Added new ower: " + ower + ".")
 
-    try: owed[chat_id][ower][owee]
+    try:
+        owed[chat_id][ower][owee]
     except:
         owed[chat_id][ower][owee] = 0
         print("Added new owee for ower " + ower + ".")
@@ -117,8 +125,10 @@ def owes(bot, update, args):
             update.message.reply_text(strings.errAllName)
             return
 
-        try: owesHelper(owed, chat_id, args[0], args[1], args[2])
-        except ValueError: update.message.reply_text(strings.errNotInt)
+        try:
+            owes_helper(owed, chat_id, args[0], args[1], args[2])
+        except ValueError:
+            update.message.reply_text(strings.errNotInt)
 
     else:
         update.message.reply_text(strings.errBadFormat)
@@ -126,12 +136,12 @@ def owes(bot, update, args):
     helper.dumpjson(strings.loc_owedjson, owed)
 
 
-def inlineOwe(bot,update):
+def inline_owe(bot, update):
     owed = helper.loadjson(strings.loc_owedjson)
     chat_id = str(update.message.chat_id)
 
     try:
-        keyboard = helper.makeKeyboard(owed[chat_id].keys(), "owers")
+        keyboard = helper.make_keyboard(owed[chat_id].keys(), "owers")
         reply = InlineKeyboardMarkup(keyboard)
         update.message.reply_text(strings.msgListMoneyOwed,
                                   reply_markup=reply)
@@ -139,7 +149,7 @@ def inlineOwe(bot,update):
         update.message.reply_text(strings.msgNoDebts)
 
 
-def cancel(bot,update, user_data):
+def cancel(bot, update, user_data):
     user_data.pop("ower")
     user_data.pop("owee")
     update.message.reply_text("Command cancelled",
@@ -158,20 +168,22 @@ def create_owee(bot, update, user_data):
     owee = update.message.text
     ower = user_data["ower"]
     user_data["owee"] = owee
-    update.message.reply_text(strings.msgNewOwee.format(owee,ower,ower,owee))
+    update.message.reply_text(strings.msgNewOwee.format(owee, ower, ower, owee))
     return AMOUNT
 
 
-def amount(bot,update, user_data):
+def amount(bot, update, user_data):
     owed = helper.loadjson(strings.loc_owedjson)
     chat_id = str(update.message.chat_id)
     ower = user_data["ower"]
     owee = user_data["owee"]
     amount = update.message.text
 
-    msg = ower + " now owes " + owee + " " + FinanceBot.currency + amount + " more."
-    try: owesHelper(owed, chat_id, ower, owee, amount) # save
-    except ValueError: msg = strings.errNotInt
+    msg = ower + " now owes " + owee + " " + FinanceBot.CURRENCY + amount + " more."
+    try:
+        owes_helper(owed, chat_id, ower, owee, amount) # save
+    except ValueError:
+        msg = strings.errNotInt
 
     update.message.reply_text(msg)
 
@@ -180,11 +192,13 @@ def amount(bot,update, user_data):
     return ConversationHandler.END
 
 
-def inlineOwes(bot,update, user_data):
+def inline_owes(bot, update):
     owed = helper.loadjson(strings.loc_owedjson)
     chat_id = str(update.message.chat_id)
-    try: keyboard = helper.makeKeyboard(owed[chat_id].keys(), "")
-    except KeyError: keyboard = []
+    try:
+        keyboard = helper.make_keyboard(owed[chat_id].keys(), "")
+    except KeyError:
+        keyboard = []
 
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.message.reply_text(strings.msgCurrentOwers,
@@ -199,8 +213,10 @@ def ower_button(bot, update, user_data):
     ower = query.data # this is the name pressed
     user_data["ower"] = ower
 
-    try: keyboard = helper.makeKeyboard(owed[chat_id][ower].keys(), "")
-    except KeyError: keyboard = []
+    try:
+        keyboard = helper.make_keyboard(owed[chat_id][ower].keys(), "")
+    except KeyError:
+        keyboard = []
 
     reply = InlineKeyboardMarkup(keyboard)
     bot.editMessageText(text=msgWhoOwedTo.format(ower),
@@ -212,14 +228,12 @@ def ower_button(bot, update, user_data):
 
 
 def owee_button(bot, update, user_data):
-    owed = helper.loadjson(strings.loc_owedjson)
     query = update.callback_query
-    chat_id = str(query.message.chat_id)
     ower = user_data["ower"]
     owee = query.data # this is the name pressed
     user_data["owee"] = owee
 
-    bot.editMessageText(text=strings.msgHowMuch.format(ower,owee),
+    bot.editMessageText(text=strings.msgHowMuch.format(ower, owee),
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id)
 
@@ -230,16 +244,16 @@ def owebutton(bot, update, user_data):
     query = update.callback_query
     chat_id = str(query.message.chat_id)
 
-    messageHere = strings.errButtonMsg
+    message_here = strings.errButtonMsg
     reply_markup = None
 
     if query.data.startswith("owers"):
         ower = query.data[5:]
         user_data["oweower"] = ower
         owed = helper.loadjson(strings.loc_owedjson)
-        keyboard = helper.makeKeyboard(owed[chat_id][ower].keys(), "owees")
+        keyboard = helper.make_keyboard(owed[chat_id][ower].keys(), "owees")
 
-        messageHere = strings.msgListMoneyOwedIndiv.format(ower)
+        message_here = strings.msgListMoneyOwedIndiv.format(ower)
         reply_markup = InlineKeyboardMarkup(keyboard)
 
     elif query.data.startswith("owees"):
@@ -247,13 +261,13 @@ def owebutton(bot, update, user_data):
         ower = user_data["oweower"]
         owee = query.data[5:]
 
-        messageHere = ower + " owes " + owee + " " + FinanceBot.currency \
+        message_here = ower + " owes " + owee + " " + FinanceBot.CURRENCY \
                         + str(owed[chat_id][ower][owee])
         user_data.pop("oweower") # cleanup
     else:
-        messageHere = strings.errUnknownCallback
+        message_here = strings.errUnknownCallback
 
-    bot.editMessageText(text=messageHere,
+    bot.editMessageText(text=message_here,
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id,
                         reply_markup=reply_markup)

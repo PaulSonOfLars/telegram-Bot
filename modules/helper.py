@@ -8,40 +8,40 @@ from telegram import InlineKeyboardButton
 import FinanceBot
 
 
-def loadjson(PATH):
-    if not os.path.isfile(PATH) or not os.access(PATH, os.R_OK):
+def loadjson(path):
+    if not os.path.isfile(path) or not os.access(path, os.R_OK):
         print(strings.errNoFile)
         name = {}
-        dumpjson(PATH, name)
-    with open(PATH) as f:
-        name = json.load(f)
+        dumpjson(path, name)
+    with open(path) as file:
+        name = json.load(file)
     return name
 
 
 def dumpjson(filename, var):
-    with open(filename, "w") as f:
-        json.dump(var, f)
+    with open(filename, "w") as file:
+        json.dump(var, file)
 
 
 def print_owed(owed, chat_id, ower, res):
     for owee in owed[chat_id][ower]:
         amount = owed[chat_id][ower][owee]
-        res += "\n" + ower + " owes " + owee + " " + FinanceBot.currency + str(amount)
+        res += "\n" + ower + " owes " + owee + " " + FinanceBot.CURRENCY + str(amount)
 
     return res
 
 
-def makeKeyboard(data, callbackCode):
-    colN = 3
+def make_keyboard(data, callback_code):
+    max_col_n = 3
     counter = 0
-    keyboard=[]
+    keyboard = []
     for elem in data:
-        if counter%colN == 0:
+        if counter%max_col_n == 0:
             keyboard.append([])
 
-        keyboard[counter//colN].append(InlineKeyboardButton(
-                                            elem,
-                                            callback_data=callbackCode + elem))
+        keyboard[counter//max_col_n].append(InlineKeyboardButton(
+            elem,
+            callback_data=callback_code + elem))
         counter += 1
 
     return keyboard
