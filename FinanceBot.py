@@ -17,7 +17,7 @@ global OWNER_ID
 OWNER_ID = int(CONFIG["OWNER"]["Telegram_ID"])
 
 global CURRENCY
-CURRENCY = CONFIG["SETTINGS"]["CURRENCY_code"]
+CURRENCY = CONFIG["SETTINGS"]["currency_code"]
 
 global KEY
 KEY = CONFIG["KEYS"]["BOT_API_KEY"]
