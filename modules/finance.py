@@ -150,8 +150,11 @@ def inline_owe(bot, update):
 
 
 def cancel(bot, update, user_data):
-    user_data.pop("ower")
-    user_data.pop("owee")
+    try:
+        user_data.pop("ower")
+        user_data.pop("owee")
+    except KeyError:
+        pass
     update.message.reply_text("Command cancelled",
                               reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
@@ -161,7 +164,7 @@ def create_ower(bot, update, user_data):
     ower = update.message.text
     user_data["ower"] = ower
     update.message.reply_text(strings.msgNewOwer.format(ower, ower))
-    return OWEE
+    return FinanceBot.OWEE
 
 
 def create_owee(bot, update, user_data):
@@ -169,7 +172,7 @@ def create_owee(bot, update, user_data):
     ower = user_data["ower"]
     user_data["owee"] = owee
     update.message.reply_text(strings.msgNewOwee.format(owee, ower, ower, owee))
-    return AMOUNT
+    return FinanceBot.AMOUNT
 
 
 def amount(bot, update, user_data):
@@ -203,7 +206,7 @@ def inline_owes(bot, update):
     reply_markup = InlineKeyboardMarkup(keyboard)
     update.message.reply_text(strings.msgCurrentOwers,
                               reply_markup=reply_markup)
-    return OWER
+    return FinanceBot.OWER
 
 
 def ower_button(bot, update, user_data):
@@ -219,12 +222,12 @@ def ower_button(bot, update, user_data):
         keyboard = []
 
     reply = InlineKeyboardMarkup(keyboard)
-    bot.editMessageText(text=msgWhoOwedTo.format(ower),
+    bot.editMessageText(text=strings.msgWhoOwedTo.format(ower),
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id,
                         reply_markup=reply)
 
-    return OWEE
+    return FinanceBot.OWEE
 
 
 def owee_button(bot, update, user_data):
@@ -237,7 +240,7 @@ def owee_button(bot, update, user_data):
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id)
 
-    return AMOUNT
+    return FinanceBot.AMOUNT
 
 
 def owebutton(bot, update, user_data):

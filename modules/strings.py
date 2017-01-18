@@ -62,3 +62,4 @@ errCommandStillRunning = "Sorry, I realised I was still running that. Please try
 errUnauthCommand = "User {} tried to issue an owner command."
 errButtonMsg = "Error. Message not set after button call."
 errUnknownCallback = "Err: unrecognised callback code."
+errNothingToCancel = "Nothing to cancel!"

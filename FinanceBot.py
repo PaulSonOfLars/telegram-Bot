@@ -9,7 +9,6 @@ from telegram.ext import CallbackQueryHandler
 from telegram.ext import ConversationHandler
 from modules import finance, misc, strings, notes
 
-
 # initialise globals
 CONFIG = configparser.ConfigParser()
 CONFIG.read("FinanceBot.ini")
@@ -44,10 +43,17 @@ def __repr__(self):
 
 def unknown(bot, update, user_data):
     if update.message.text == "/iowes":
-        user_data.pop("ower")
-        user_data.pop("owee")
+        try:
+            user_data.pop("ower")
+            user_data.pop("owee")
+        except KeyError:
+            pass
         update.message.reply_text(strings.errCommandStillRunning)
         return ConversationHandler.END
+
+    else if update.message.text == "/cancel":
+        update.message.reply_text(strings.errNothingToCancel)
+
     else:
         update.message.reply_text(strings.errUnknownCommand)
 
