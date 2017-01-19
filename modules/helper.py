@@ -26,7 +26,8 @@ def dumpjson(filename, var):
         json.dump(var, file)
 
 
-def print_owed(owed, chat_id, ower, res):
+def print_owed(owed, chat_id, ower):
+    res = ""
     for owee in owed[chat_id][ower]:
         amount = owed[chat_id][ower][owee]
         res += "\n" + ower + " owes " + owee + " " + FinanceBot.CURRENCY + str(amount)
@@ -41,7 +42,7 @@ def make_keyboard(data, callback_code):
     for elem in data:
         if counter%max_col_n == 0:
             keyboard.append([])
-
+                                    # // is used for integer division
         keyboard[counter//max_col_n].append(InlineKeyboardButton(
             elem,
             callback_data=callback_code + elem))

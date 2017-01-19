@@ -13,33 +13,69 @@ from modules import helper, strings
 import FinanceBot
 
 
-def owe(bot, update, args):
+# def owe(bot, update, args):
+#     owed = helper.loadjson(strings.loc_owedjson)
+#     chat_id = str(update.message.chat_id)
+#
+#     try:
+#         owed[chat_id]
+#     except KeyError:
+#         owed[chat_id] = {}
+#
+#     res = strings.msgNoDebts
+#     if len(args) == 0:
+#         if len(owed[chat_id]) == 0:
+#             res = strings.msgNoDebts
+#         else:
+#             res = strings.msgListMoneyOwed
+#             for ower in owed[chat_id]:
+#                 res = helper.print_owed(owed, chat_id, ower, res)
+#
+#     elif len(args) == 1:
+#         try:
+#             res = strings.msgListMoneyOwedIndiv.format(args[0])
+#             res = helper.print_owed(owed, chat_id, args[0], res)
+#         except KeyError:
+#             res = args[0] + " has no debts!"
+#     else:
+#         res = strings.errBadFormat
+#     update.message.reply_text(res)
+
+
+def list_owed(bot, update, args):
     owed = helper.loadjson(strings.loc_owedjson)
     chat_id = str(update.message.chat_id)
+    reply_markup = None
 
     try:
         owed[chat_id]
     except KeyError:
         owed[chat_id] = {}
 
-    res = strings.msgNoDebts
     if len(args) == 0:
-        if len(owed[chat_id]) == 0:
-            res = strings.msgNoDebts
-        else:
-            res = strings.msgListMoneyOwed
-            for ower in owed[chat_id]:
-                res = helper.print_owed(owed, chat_id, ower, res)
+        keyboard = helper.make_keyboard(owed[chat_id].keys(), "owers")
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        res = strings.msgListMoneyOwed
 
     elif len(args) == 1:
-        try:
-            res = strings.msgListMoneyOwedIndiv.format(args[0])
-            res = helper.print_owed(owed, chat_id, args[0], res)
-        except KeyError:
-            res = args[0] + " has no debts!"
+        if args[0] == "all": # if arg1 is "all", print all debts
+            if len(owed[chat_id]) == 0:
+                res = strings.msgNoDebts
+            else:
+                res = strings.msgListMoneyOwed
+                for ower in owed[chat_id]:
+                    res = helper.print_owed(owed, chat_id, ower, res)
+        else: # else, print debts of name
+            try:
+                res = strings.msgListMoneyOwedIndiv.format(args[0])
+                res += helper.print_owed(owed, chat_id, args[0])
+            except KeyError:
+                res = args[0] + " has no debts!"
+
     else:
         res = strings.errBadFormat
-    update.message.reply_text(res)
+
+    update.message.reply_text(res, reply_markup=reply_markup)
 
 
 def clear(bot, update, args):
@@ -121,38 +157,65 @@ def owes_helper(owed, chat_id, ower, owee, amount):
                 owed.pop(chat_id)
 
 
-def owes(bot, update, args):
+def inline_owes(bot, update, args, user_data):
     owed = helper.loadjson(strings.loc_owedjson)
     chat_id = str(update.message.chat_id)
+    res = ""
 
-    if len(args) == 3:
+    if len(args) == 0:
+        try:
+            keyboard = helper.make_keyboard(owed[chat_id].keys(), "")
+            res = strings.msgCurrentOwers
+        except KeyError:
+            res = strings.msgNoDebts
+            keyboard = []
 
-        if args[0] == "all" or args[1] == "all":
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        update.message.reply_text(res, reply_markup=reply_markup)
+        return FinanceBot.OWER
+
+    elif len(args) == 1:
+        if args[0] == "all":
             update.message.reply_text(strings.errAllName)
-            return
+            return ConversationHandler.END
 
         try:
-            owes_helper(owed, chat_id, args[0], args[1], args[2])
-        except ValueError:
-            update.message.reply_text(strings.errNotInt)
+            res = strings.msgWhoOwedTo.format(args[0])
+            keyboard = helper.make_keyboard(owed[chat_id][args[0]].keys(), "")
+        except KeyError:
+            keyboard = []
+
+        user_data["ower"] = args[0]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        update.message.reply_text(res, reply_markup=reply_markup)
+        return FinanceBot.OWEE
+
+    elif len(args) == 2:
+        if args[0] == "all" or args[1] == "all":
+            update.message.reply_text(strings.errAllName)
+            return ConversationHandler.END
+        user_data["ower"] = args[0]
+        user_data["owee"] = args[1]
+        update.message.reply_text(strings.msgHowMuch.format(args[0], args[1]))
+        return FinanceBot.AMOUNT
+
+    elif len(args) == 3:
+        if args[0] == "all" or args[1] == "all":
+            update.message.reply_text(strings.errAllName)
+        else:
+            try:
+                owes_helper(owed, chat_id, args[0], args[1], args[2])
+            except ValueError:
+                update.message.reply_text(strings.errNotInt)
+            helper.dumpjson(strings.loc_owedjson, owed)
+            update.message.reply_text(args[0] + " now owes " + args[1] + " " + \
+                                      FinanceBot.CURRENCY + args[2] + " more.")
 
     else:
         update.message.reply_text(strings.errBadFormat)
 
-    helper.dumpjson(strings.loc_owedjson, owed)
+    return ConversationHandler.END
 
-
-def inline_owe(bot, update):
-    owed = helper.loadjson(strings.loc_owedjson)
-    chat_id = str(update.message.chat_id)
-
-    try:
-        keyboard = helper.make_keyboard(owed[chat_id].keys(), "owers")
-        reply = InlineKeyboardMarkup(keyboard)
-        update.message.reply_text(strings.msgListMoneyOwed,
-                                  reply_markup=reply)
-    except KeyError:
-        update.message.reply_text(strings.msgNoDebts)
 
 
 def cancel(bot, update, user_data):
@@ -201,20 +264,6 @@ def amount_owed(bot, update, user_data):
     return ConversationHandler.END
 
 
-def inline_owes(bot, update):
-    owed = helper.loadjson(strings.loc_owedjson)
-    chat_id = str(update.message.chat_id)
-    try:
-        keyboard = helper.make_keyboard(owed[chat_id].keys(), "")
-    except KeyError:
-        keyboard = []
-
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    update.message.reply_text(strings.msgCurrentOwers,
-                              reply_markup=reply_markup)
-    return FinanceBot.OWER
-
-
 def ower_button(bot, update, user_data):
     owed = helper.loadjson(strings.loc_owedjson)
     query = update.callback_query
@@ -249,7 +298,7 @@ def owee_button(bot, update, user_data):
     return FinanceBot.AMOUNT
 
 
-def owebutton(bot, update, user_data):
+def list_owed_button(bot, update, user_data):
     query = update.callback_query
     chat_id = str(query.message.chat_id)
 

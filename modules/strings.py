@@ -26,7 +26,7 @@ msgListMoneyOwedIndiv = "Here is a list of everyone {} owes money to: \n"
 
 msgHowMuch = "How much does {} owe {}? Please type a number."
 msgNewOwer = "{} was saved as a new ower. Please input the name of the person that {} owes money to."
-msgNewOwee = "{} was saved as a new owee for {}." + msgHowMuch
+msgNewOwee = "{} was saved as a new owee for {}. " + msgHowMuch
 msgCurrentOwers = "Here is the current list of people who owe money. Please select one, or reply with a new name to add a new ower."
 msgWhoOwedTo = "Who does {} owe money to? Type in a new name to add a new owee."
 
