@@ -8,13 +8,20 @@ msgHelp = """Hi! This bot is currently WIP. I'm working on it!
 current commands are:
 - /start the bot introduces itself.
 - /help prints this message.
+- /idme returns your telegram ID.
+- /save <notename> <message> saves the message.
+- /get <notename> gets the message related to that notename.
+- /note returns the list of notes for this chat.
+- /owe opens a keayboard of people owing money that can be selected to see individual debts.
+- /owe `all` prints a list of all people owing money.
+- /owe <ower> prints list of debts for that person.
+- /owes opens up a list of people currently owing money. Type a name to add new people.
 - /owes <ower> <owee> <sum> tells you ower owes X to owee.
-- /owe prints a list of all people owing money.
-- /owe <ower> prints a list of all people being owed money to.
+
+Admin only:
 - /clear `all` clears the entire database of owed money.
 - /clear <ower> `all` clears everything the ower owes.
 - /clear <ower> <owee> clears the debt of ower towards owee.
-- /idme returns your telegram ID.
 
 Note: some commands are WIP and so aren't shown here. Feel free to use them,\
 but keep in mind they might change in the future."""
