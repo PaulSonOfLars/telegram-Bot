@@ -9,3 +9,5 @@ FinanceBot.ini
 
 # ignore compiled python files
 *.pyc
+
+.pylintrc

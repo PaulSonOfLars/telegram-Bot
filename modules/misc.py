@@ -5,6 +5,7 @@
 It is full of small, helpful functions that don't quite need a full module
 and that a user might use for information.
 """
+from telegram.ext import CommandHandler
 from subprocess import check_output, CalledProcessError, TimeoutExpired
 from modules import strings
 import FinanceBot
@@ -42,3 +43,9 @@ def get_bot_ip(bot, update):
         except TimeoutExpired:
             msg_to_send = strings.errTimeout
         update.message.reply_text(msg_to_send)
+
+
+start_handler = CommandHandler("start", start)
+help_handler = CommandHandler("help", helpme)
+idme_handler = CommandHandler("idme", idme)
+botip_handler = CommandHandler("botip", get_bot_ip)

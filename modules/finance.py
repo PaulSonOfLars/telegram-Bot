@@ -7,39 +7,14 @@ The data is stored in data/owed.json, which is loaded using some of the helper
 functions.
 """
 
-from telegram.ext import ConversationHandler
+from telegram.ext import (ConversationHandler, MessageHandler, CommandHandler,
+                          Filters, CallbackQueryHandler)
 from telegram import InlineKeyboardMarkup, ReplyKeyboardRemove
 from modules import helper, strings
 import FinanceBot
 
-
-# def owe(bot, update, args):
-#     owed = helper.loadjson(strings.loc_owedjson)
-#     chat_id = str(update.message.chat_id)
-#
-#     try:
-#         owed[chat_id]
-#     except KeyError:
-#         owed[chat_id] = {}
-#
-#     res = strings.msgNoDebts
-#     if len(args) == 0:
-#         if len(owed[chat_id]) == 0:
-#             res = strings.msgNoDebts
-#         else:
-#             res = strings.msgListMoneyOwed
-#             for ower in owed[chat_id]:
-#                 res = helper.print_owed(owed, chat_id, ower, res)
-#
-#     elif len(args) == 1:
-#         try:
-#             res = strings.msgListMoneyOwedIndiv.format(args[0])
-#             res = helper.print_owed(owed, chat_id, args[0], res)
-#         except KeyError:
-#             res = args[0] + " has no debts!"
-#     else:
-#         res = strings.errBadFormat
-#     update.message.reply_text(res)
+# give numbers for the ConversationHandler buttons used in /iowes
+OWER, OWEE, AMOUNT = range(3)
 
 
 def list_owed(bot, update, args):
@@ -64,7 +39,7 @@ def list_owed(bot, update, args):
             else:
                 res = strings.msgListMoneyOwed
                 for ower in owed[chat_id]:
-                    res = helper.print_owed(owed, chat_id, ower, res)
+                    res += helper.print_owed(owed, chat_id, ower)
         else: # else, print debts of name
             try:
                 res = strings.msgListMoneyOwedIndiv.format(args[0])
@@ -127,7 +102,8 @@ def clear(bot, update, args):
     helper.dumpjson(strings.loc_owedjson, owed)
 
 
-def owes_helper(owed, chat_id, ower, owee, amount):
+def owes_helper(chat_id, ower, owee, amount):
+    owed = helper.loadjson(strings.loc_owedjson)
 
     try:
         owed[chat_id]
@@ -147,6 +123,7 @@ def owes_helper(owed, chat_id, ower, owee, amount):
         print("Added new owee for ower " + ower + ".")
 
     owed[chat_id][ower][owee] += float(amount)
+    result = owed[chat_id][ower][owee]
 
     # check whether owed sum is now 0 and removes if necessary
     if owed[chat_id][ower][owee] == 0:
@@ -155,6 +132,9 @@ def owes_helper(owed, chat_id, ower, owee, amount):
             owed[chat_id].pop(ower)
             if owed[chat_id] == {}:
                 owed.pop(chat_id)
+
+    helper.dumpjson(strings.loc_owedjson, owed)
+    return result
 
 
 def inline_owes(bot, update, args, user_data):
@@ -172,7 +152,7 @@ def inline_owes(bot, update, args, user_data):
 
         reply_markup = InlineKeyboardMarkup(keyboard)
         update.message.reply_text(res, reply_markup=reply_markup)
-        return FinanceBot.OWER
+        return OWER
 
     elif len(args) == 1:
         if args[0] == "all":
@@ -188,7 +168,7 @@ def inline_owes(bot, update, args, user_data):
         user_data["ower"] = args[0]
         reply_markup = InlineKeyboardMarkup(keyboard)
         update.message.reply_text(res, reply_markup=reply_markup)
-        return FinanceBot.OWEE
+        return OWEE
 
     elif len(args) == 2:
         if args[0] == "all" or args[1] == "all":
@@ -197,19 +177,18 @@ def inline_owes(bot, update, args, user_data):
         user_data["ower"] = args[0]
         user_data["owee"] = args[1]
         update.message.reply_text(strings.msgHowMuch.format(args[0], args[1]))
-        return FinanceBot.AMOUNT
+        return AMOUNT
 
     elif len(args) == 3:
         if args[0] == "all" or args[1] == "all":
             update.message.reply_text(strings.errAllName)
         else:
             try:
-                owes_helper(owed, chat_id, args[0], args[1], args[2])
+                amount = owes_helper(chat_id, args[0], args[1], args[2])
+                update.message.reply_text(args[0] + " now owes " + args[1] + " " + \
+                                          FinanceBot.CURRENCY + str(amount) + ".")
             except ValueError:
                 update.message.reply_text(strings.errNotInt)
-            helper.dumpjson(strings.loc_owedjson, owed)
-            update.message.reply_text(args[0] + " now owes " + args[1] + " " + \
-                                      FinanceBot.CURRENCY + args[2] + " more.")
 
     else:
         update.message.reply_text(strings.errBadFormat)
@@ -233,7 +212,7 @@ def create_ower(bot, update, user_data):
     ower = update.message.text
     user_data["ower"] = ower
     update.message.reply_text(strings.msgNewOwer.format(ower, ower))
-    return FinanceBot.OWEE
+    return OWEE
 
 
 def create_owee(bot, update, user_data):
@@ -241,26 +220,25 @@ def create_owee(bot, update, user_data):
     ower = user_data["ower"]
     user_data["owee"] = owee
     update.message.reply_text(strings.msgNewOwee.format(owee, ower, ower, owee))
-    return FinanceBot.AMOUNT
+    return AMOUNT
 
 
 def amount_owed(bot, update, user_data):
-    owed = helper.loadjson(strings.loc_owedjson)
     chat_id = str(update.message.chat_id)
     ower = user_data["ower"]
     owee = user_data["owee"]
     amount = update.message.text
 
-    msg = ower + " now owes " + owee + " " + FinanceBot.CURRENCY + amount + " more."
     try:
-        owes_helper(owed, chat_id, ower, owee, amount) # save
+        amount = owes_helper(chat_id, ower, owee, amount) # save
+        msg = ower + " now owes " + owee + " " + FinanceBot.CURRENCY + str(amount) + "."
     except ValueError:
         msg = strings.errNotInt
 
     update.message.reply_text(msg)
 
-    helper.dumpjson(strings.loc_owedjson, owed)
-    user_data.clear()
+    user_data.pop("ower")
+    user_data.pop("owee")
     return ConversationHandler.END
 
 
@@ -282,7 +260,7 @@ def ower_button(bot, update, user_data):
                         message_id=query.message.message_id,
                         reply_markup=reply)
 
-    return FinanceBot.OWEE
+    return OWEE
 
 
 def owee_button(bot, update, user_data):
@@ -295,7 +273,7 @@ def owee_button(bot, update, user_data):
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id)
 
-    return FinanceBot.AMOUNT
+    return AMOUNT
 
 
 def list_owed_button(bot, update, user_data):
@@ -329,3 +307,49 @@ def list_owed_button(bot, update, user_data):
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id,
                         reply_markup=reply_markup)
+
+
+def reset_owes(bot, update, user_data):
+    try:
+        user_data.pop("ower")
+        user_data.pop("owee")
+    except KeyError:
+        pass
+    update.message.reply_text(strings.errCommandStillRunning,
+                              reply_markup=ReplyKeyboardRemove())
+    return ConversationHandler.END
+
+# define handlers
+clear_handler = CommandHandler("clear", clear, pass_args=True)
+owe_handler = CommandHandler("owe", list_owed, pass_args=True)
+owes_buttons_handler = CallbackQueryHandler(list_owed_button, pass_user_data=True)
+owes_handler = ConversationHandler(
+    entry_points=[CommandHandler("owes",
+                                 inline_owes,
+                                 pass_args=True,
+                                 pass_user_data=True)],
+
+    states={
+        OWER: [MessageHandler(Filters.text,
+                              create_ower,
+                              pass_user_data=True),
+               CallbackQueryHandler(ower_button,
+                                    pass_user_data=True)],
+
+        OWEE: [MessageHandler(Filters.text,
+                              create_owee,
+                              pass_user_data=True),
+               CallbackQueryHandler(owee_button,
+                                    pass_user_data=True)],
+
+        AMOUNT: [MessageHandler(Filters.text,
+                                amount_owed,
+                                pass_user_data=True)]
+    },
+    fallbacks=[CommandHandler("cancel",
+                              cancel,
+                              pass_user_data=True),
+               CommandHandler("owes",
+                              reset_owes,
+                              pass_user_data=True)]
+)

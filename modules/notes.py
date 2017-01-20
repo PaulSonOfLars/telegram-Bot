@@ -6,6 +6,7 @@
 Note data is found in data/notes.json.
 """
 
+from telegram.ext import CommandHandler
 from modules import helper, strings
 
 def save_note(bot, update, args):
@@ -69,3 +70,8 @@ def all_notes(bot, update, args):
             msg += "\n" + note
 
     update.message.reply_text(msg)
+
+
+save_handler = CommandHandler("save", save_note, pass_args=True)
+get_handler = CommandHandler("get", get_note, pass_args=True)
+note_handler = CommandHandler("note", all_notes, pass_args=True)

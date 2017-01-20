@@ -15,9 +15,7 @@ directory; this allows modules to be added or removed in a simpler fashion.
 import os
 import configparser
 import logging
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from telegram.ext import CallbackQueryHandler
-from telegram.ext import ConversationHandler
+from telegram.ext import Updater, MessageHandler, Filters
 from modules import finance, misc, strings, notes
 
 # initialise globals
@@ -31,8 +29,6 @@ CURRENCY = CONFIG["SETTINGS"]["currency_code"]
 
 KEY = CONFIG["KEYS"]["BOT_API_KEY"]
 
-# give numbers for the ConversationHandler buttons used in /iowes
-OWER, OWEE, AMOUNT = range(3)
 
 # enable logging
 logging.basicConfig(
@@ -44,16 +40,7 @@ LOGGER = logging.getLogger(__name__)
 def unknown(bot, update, user_data):
     """Used to respond to unknown command inputs, and deal with edge cases."""
 
-    if update.message.text == "/owes":
-        try:
-            user_data.pop("ower")
-            user_data.pop("owee")
-        except KeyError:
-            pass
-        update.message.reply_text(strings.errCommandStillRunning)
-        return ConversationHandler.END
-
-    elif update.message.text == "/cancel":
+    if update.message.text == "/cancel":
         update.message.reply_text(strings.errNothingToCancel)
 
     else:
@@ -76,53 +63,24 @@ def main():
 
     # LINK FUNCTIONS
 
-    owes_conversation_handler = ConversationHandler(
-        entry_points=[CommandHandler("owes",
-                                     finance.inline_owes,
-                                     pass_args=True,
-                                     pass_user_data=True)],
+    # misc module
+    dispatcher.add_handler(misc.start_handler)
+    dispatcher.add_handler(misc.help_handler)
+    dispatcher.add_handler(misc.idme_handler)
+    dispatcher.add_handler(misc.botip_handler)
 
-        states={
-            OWER: [MessageHandler(Filters.text,
-                                  finance.create_ower,
-                                  pass_user_data=True),
-                   CallbackQueryHandler(finance.ower_button,
-                                        pass_user_data=True)],
+    # notes module
+    dispatcher.add_handler(notes.save_handler)
+    dispatcher.add_handler(notes.get_handler)
+    dispatcher.add_handler(notes.note_handler)
 
-            OWEE: [MessageHandler(Filters.text,
-                                  finance.create_owee,
-                                  pass_user_data=True),
-                   CallbackQueryHandler(finance.owee_button,
-                                        pass_user_data=True)],
+    # finance module
+    dispatcher.add_handler(finance.clear_handler)
+    dispatcher.add_handler(finance.owe_handler)
+    dispatcher.add_handler(finance.owes_handler)
+    dispatcher.add_handler(finance.owes_buttons_handler) # not a cmd.
 
-            AMOUNT: [MessageHandler(Filters.text,
-                                    finance.amount_owed,
-                                    pass_user_data=True)]
-        },
-        fallbacks=[CommandHandler("cancel",
-                                  finance.cancel,
-                                  pass_user_data=True),
-                   MessageHandler(Filters.command,
-                                  unknown,
-                                  pass_user_data=True)]
-    )
-
-    dispatcher.add_handler(CommandHandler("start", misc.start))
-    dispatcher.add_handler(CommandHandler("help", misc.helpme))
-    dispatcher.add_handler(CommandHandler("clear", finance.clear, pass_args=True))
-    dispatcher.add_handler(CommandHandler("owe", finance.list_owed, pass_args=True))
-    dispatcher.add_handler(CommandHandler("idme", misc.idme))
-    dispatcher.add_handler(CommandHandler("botip", misc.get_bot_ip))
-    dispatcher.add_handler(CommandHandler("save", notes.save_note, pass_args=True))
-    dispatcher.add_handler(CommandHandler("get", notes.get_note, pass_args=True))
-    dispatcher.add_handler(CommandHandler("note", notes.all_notes, pass_args=True))
-
-    dispatcher.add_handler(owes_conversation_handler)
-
-
-    dispatcher.add_handler(CallbackQueryHandler(finance.list_owed_button, pass_user_data=True))
-
-    #unknown commands, leave last.
+    # unknown commands, leave last.
     dispatcher.add_handler(MessageHandler(Filters.command,
                                           unknown,
                                           pass_user_data=True))
