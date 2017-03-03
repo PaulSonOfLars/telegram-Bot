@@ -18,6 +18,13 @@ import logging
 from telegram.ext import Updater, MessageHandler, Filters
 from modules import finance, misc, strings, notes
 
+
+# if __name__ == '__main___':
+#     from modules import finance, misc, strings, notes
+# else:
+#     from .modules import finance, misc, strings, notes
+
+
 # initialise globals
 # load config file
 CONFIG = configparser.ConfigParser()
