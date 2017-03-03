@@ -18,7 +18,7 @@ OWER, OWEE, AMOUNT = range(3)
 
 
 def list_owed(bot, update, args):
-    owed = helper.loadjson(strings.loc_owedjson)
+    owed = helper.loadjson(loc_owedjson)
     chat_id = str(update.message.chat_id)
     reply_markup = None
 
@@ -30,19 +30,19 @@ def list_owed(bot, update, args):
     if len(args) == 0:
         keyboard = helper.make_keyboard(owed[chat_id].keys(), "owers")
         reply_markup = InlineKeyboardMarkup(keyboard)
-        res = strings.msgListMoneyOwed
+        res = msgListMoneyOwed
 
     elif len(args) == 1:
         if args[0] == "all": # if arg1 is "all", print all debts
             if len(owed[chat_id]) == 0:
-                res = strings.msgNoDebts
+                res = msgNoDebts
             else:
-                res = strings.msgListMoneyOwed
+                res = msgListMoneyOwed
                 for ower in owed[chat_id]:
                     res += helper.print_owed(owed, chat_id, ower)
         else: # else, print debts of name
             try:
-                res = strings.msgListMoneyOwedIndiv.format(args[0])
+                res = msgListMoneyOwedIndiv.format(args[0])
                 res += helper.print_owed(owed, chat_id, args[0])
             except KeyError:
                 res = args[0] + " has no debts!"
@@ -54,7 +54,7 @@ def list_owed(bot, update, args):
 
 
 def clear(bot, update, args):
-    owed = helper.loadjson(strings.loc_owedjson)
+    owed = helper.loadjson(loc_owedjson)
     chat_id = str(update.message.chat_id)
     sender = update.message.from_user
 
@@ -69,10 +69,10 @@ def clear(bot, update, args):
         return
 
     if len(args) == 1 and args[0] == "all":
-        helper.dumpjson(strings.loc_bckpjson, owed)
+        helper.dumpjson(loc_bckpjson, owed)
         owed.pop(chat_id)
-        update.message.reply_text(strings.msgAllDebtsCleared)
-        print(strings.msgAllDebtsClearedTerm)
+        update.message.reply_text(msgAllDebtsCleared)
+        print(msgAllDebtsClearedTerm)
 
     elif len(args) == 2:
         try:
@@ -83,12 +83,12 @@ def clear(bot, update, args):
 
         if args[1] == "all":
             owed[chat_id].pop(args[0])
-            print(strings.msgDebtsOfCleared.format(args[0]))
+            print(msgDebtsOfCleared.format(args[0]))
 
         else:
             owed[chat_id][args[0]].pop(args[1])
             update.message.reply_text(
-                strings.msgDebtsOfToCleared.format(args[0], args[1]))
+                msgDebtsOfToCleared.format(args[0], args[1]))
 
             # remove from database if no debts
             if owed[chat_id] == {}:
@@ -99,11 +99,11 @@ def clear(bot, update, args):
     else:
         update.message.reply_text(strings.errBadFormat)
 
-    helper.dumpjson(strings.loc_owedjson, owed)
+    helper.dumpjson(loc_owedjson, owed)
 
 
 def owes_helper(chat_id, ower, owee, amount):
-    owed = helper.loadjson(strings.loc_owedjson)
+    owed = helper.loadjson(loc_owedjson)
 
     try:
         owed[chat_id]
@@ -133,21 +133,21 @@ def owes_helper(chat_id, ower, owee, amount):
             if owed[chat_id] == {}:
                 owed.pop(chat_id)
 
-    helper.dumpjson(strings.loc_owedjson, owed)
+    helper.dumpjson(loc_owedjson, owed)
     return result
 
 
 def inline_owes(bot, update, args, user_data):
-    owed = helper.loadjson(strings.loc_owedjson)
+    owed = helper.loadjson(loc_owedjson)
     chat_id = str(update.message.chat_id)
     res = ""
 
     if len(args) == 0:
         try:
             keyboard = helper.make_keyboard(owed[chat_id].keys(), "")
-            res = strings.msgCurrentOwers
+            res = msgCurrentOwers
         except KeyError:
-            res = strings.msgNoDebts
+            res = msgNoDebts
             keyboard = []
 
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -160,7 +160,7 @@ def inline_owes(bot, update, args, user_data):
             return ConversationHandler.END
 
         try:
-            res = strings.msgWhoOwedTo.format(args[0])
+            res = msgWhoOwedTo.format(args[0])
             keyboard = helper.make_keyboard(owed[chat_id][args[0]].keys(), "")
         except KeyError:
             keyboard = []
@@ -176,7 +176,7 @@ def inline_owes(bot, update, args, user_data):
             return ConversationHandler.END
         user_data["ower"] = args[0]
         user_data["owee"] = args[1]
-        update.message.reply_text(strings.msgHowMuch.format(args[0], args[1]))
+        update.message.reply_text(msgHowMuch.format(args[0], args[1]))
         return AMOUNT
 
     elif len(args) == 3:
@@ -211,7 +211,7 @@ def cancel(bot, update, user_data):
 def create_ower(bot, update, user_data):
     ower = update.message.text
     user_data["ower"] = ower
-    update.message.reply_text(strings.msgNewOwer.format(ower, ower))
+    update.message.reply_text(msgNewOwer.format(ower, ower))
     return OWEE
 
 
@@ -219,7 +219,7 @@ def create_owee(bot, update, user_data):
     owee = update.message.text
     ower = user_data["ower"]
     user_data["owee"] = owee
-    update.message.reply_text(strings.msgNewOwee.format(owee, ower, ower, owee))
+    update.message.reply_text(msgNewOwee.format(owee, ower, ower, owee))
     return AMOUNT
 
 
@@ -243,7 +243,7 @@ def amount_owed(bot, update, user_data):
 
 
 def ower_button(bot, update, user_data):
-    owed = helper.loadjson(strings.loc_owedjson)
+    owed = helper.loadjson(loc_owedjson)
     query = update.callback_query
     chat_id = str(query.message.chat_id)
     ower = query.data # this is the name pressed
@@ -255,7 +255,7 @@ def ower_button(bot, update, user_data):
         keyboard = []
 
     reply = InlineKeyboardMarkup(keyboard)
-    bot.editMessageText(text=strings.msgWhoOwedTo.format(ower),
+    bot.editMessageText(text=msgWhoOwedTo.format(ower),
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id,
                         reply_markup=reply)
@@ -269,7 +269,7 @@ def owee_button(bot, update, user_data):
     owee = query.data # this is the name pressed
     user_data["owee"] = owee
 
-    bot.editMessageText(text=strings.msgHowMuch.format(ower, owee),
+    bot.editMessageText(text=msgHowMuch.format(ower, owee),
                         chat_id=query.message.chat_id,
                         message_id=query.message.message_id)
 
@@ -286,14 +286,14 @@ def list_owed_button(bot, update, user_data):
     if query.data.startswith("owers"):
         ower = query.data[5:]
         user_data["oweower"] = ower
-        owed = helper.loadjson(strings.loc_owedjson)
+        owed = helper.loadjson(loc_owedjson)
         keyboard = helper.make_keyboard(owed[chat_id][ower].keys(), "owees")
 
-        message_here = strings.msgListMoneyOwedIndiv.format(ower)
+        message_here = msgListMoneyOwedIndiv.format(ower)
         reply_markup = InlineKeyboardMarkup(keyboard)
 
     elif query.data.startswith("owees"):
-        owed = helper.loadjson(strings.loc_owedjson)
+        owed = helper.loadjson(loc_owedjson)
         ower = user_data["oweower"]
         owee = query.data[5:]
 
@@ -353,3 +353,22 @@ owes_handler = ConversationHandler(
                               reset_owes,
                               pass_user_data=True)]
 )
+
+loc_owedjson = "./data/owed.json"
+loc_bckpjson = "./data/bckp.json"
+
+msgNoMoneyOwed = "Lucky... that person doesn't owe anything!"
+msgListMoneyOwed = "Here is a list of people owing money:\n"
+msgListMoneyOwedIndiv = "Here is a list of everyone {} owes money to: \n"
+
+msgHowMuch = "How much does {} owe {}? Please type a number."
+msgNewOwer = "{} was saved as a new ower. Please input the name of the person that {} owes money to."
+msgNewOwee = "{} was saved as a new owee for {}. " + msgHowMuch
+msgCurrentOwers = "Here is the current list of people who owe money. Please select one, or reply with a new name to add a new ower."
+msgWhoOwedTo = "Who does {} owe money to? Type in a new name to add a new owee."
+
+msgNoDebts = "Wow... there are no debts here!"
+msgAllDebtsCleared = "All debts cleared!"
+msgAllDebtsClearedTerm = msgAllDebtsCleared + " A backup file can be found in bckp.json."
+msgDebtsOfCleared = "{} had all debts cleared by the owner."
+msgDebtsOfToCleared = "{}'s debts to {} were cleared."

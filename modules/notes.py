@@ -10,7 +10,7 @@ from telegram.ext import CommandHandler
 from modules import helper, strings
 
 def save_note(bot, update, args):
-    notes = helper.loadjson(strings.loc_notesjson)
+    notes = helper.loadjson(loc_notesjson)
     chat_id = str(update.message.chat_id)
 
     try:
@@ -29,11 +29,11 @@ def save_note(bot, update, args):
     else:
         update.message.reply_text(strings.errBadFormat)
 
-    helper.dumpjson(strings.loc_notesjson, notes)
+    helper.dumpjson(loc_notesjson, notes)
 
 
 def get_note(bot, update, args):
-    notes = helper.loadjson(strings.loc_notesjson)
+    notes = helper.loadjson(loc_notesjson)
     chat_id = str(update.message.chat_id)
 
     try:
@@ -45,9 +45,8 @@ def get_note(bot, update, args):
         msg = ""
         try:
             msg = notes[chat_id][args[0]]
-
         except KeyError:
-            msg = strings.errNoNoteFound + args[0]
+            msg = errNoNoteFound + args[0]
 
         update.message.reply_text(msg)
     else:
@@ -55,7 +54,7 @@ def get_note(bot, update, args):
 
 
 def all_notes(bot, update, args):
-    notes = helper.loadjson(strings.loc_notesjson)
+    notes = helper.loadjson(loc_notesjson)
     chat_id = str(update.message.chat_id)
 
     try:
@@ -65,7 +64,7 @@ def all_notes(bot, update, args):
 
     msg = "No notes in this chat."
     if len(notes[chat_id]) > 0:
-        msg = strings.msgNotesForChat
+        msg = msgNotesForChat
         for note in notes[chat_id]:
             msg += "\n" + note
 
@@ -75,3 +74,9 @@ def all_notes(bot, update, args):
 save_handler = CommandHandler("save", save_note, pass_args=True)
 get_handler = CommandHandler("get", get_note, pass_args=True)
 note_handler = CommandHandler("note", all_notes, pass_args=True)
+
+loc_notesjson = "./data/notes.json"
+
+msgNotesForChat = "These are the notes i have saved for this chat: \n"
+
+errNoNoteFound = "No note found by the name of "

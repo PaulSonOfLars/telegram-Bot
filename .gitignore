@@ -5,7 +5,7 @@
 data/
 
 # ignore personal settings (with key)
-FinanceBot.ini
+Bot.ini
 
 # ignore compiled python files
 *.pyc
