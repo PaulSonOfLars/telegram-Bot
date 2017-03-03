@@ -1,1 +1,1 @@
-worker: python3.5 FinanceBot.py
+worker: python3.5 Bot.py

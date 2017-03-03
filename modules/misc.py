@@ -8,7 +8,7 @@ and that a user might use for information.
 from telegram.ext import CommandHandler
 from subprocess import check_output, CalledProcessError, TimeoutExpired
 from modules import strings
-import FinanceBot
+import Bot
 
 def start(bot, update):
     """ First command a bot receives."""
@@ -31,7 +31,7 @@ def get_bot_ip(bot, update):
         OWNER ONLY.
     """
     sender = update.message.from_user
-    if sender.id == FinanceBot.OWNER_ID:
+    if sender.id == Bot.OWNER_ID:
         msg_to_send = ""
         try:
             ip_string = check_output(["curl", "ipinfo.io/ip"],
@@ -72,6 +72,6 @@ Admin only:
 
 Note: some commands are WIP and so aren't shown here. Feel free to use them,\
 but keep in mind they might change in the future."""
-msgStart = "This is FinanceBot! He can help you take care of your house finances. Use /help for more info."
+msgStart = "This is Bot! He can help you take care of your house finances. Use /help for more info."
 
 msgIpAddress = "The bot's IP address is: "

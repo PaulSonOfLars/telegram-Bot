@@ -11,7 +11,7 @@ from telegram.ext import (ConversationHandler, MessageHandler, CommandHandler,
                           Filters, CallbackQueryHandler)
 from telegram import InlineKeyboardMarkup, ReplyKeyboardRemove
 from modules import helper, strings
-import FinanceBot
+import Bot
 
 # give numbers for the ConversationHandler buttons used in /iowes
 OWER, OWEE, AMOUNT = range(3)
@@ -63,7 +63,7 @@ def clear(bot, update, args):
     except KeyError:
         owed[chat_id] = {}
 
-    if sender.id != FinanceBot.OWNER_ID:
+    if sender.id != Bot.OWNER_ID:
         update.message.reply_text(strings.errNotAdmin)
         print(strings.errUnauthCommand.format(sender.username))
         return
@@ -186,7 +186,7 @@ def inline_owes(bot, update, args, user_data):
             try:
                 amount = owes_helper(chat_id, args[0], args[1], args[2])
                 update.message.reply_text(args[0] + " now owes " + args[1] + " " + \
-                                          FinanceBot.CURRENCY + str(amount) + ".")
+                                          Bot.CURRENCY + str(amount) + ".")
             except ValueError:
                 update.message.reply_text(strings.errNotInt)
 
@@ -231,7 +231,7 @@ def amount_owed(bot, update, user_data):
 
     try:
         amount = owes_helper(chat_id, ower, owee, amount) # save
-        msg = ower + " now owes " + owee + " " + FinanceBot.CURRENCY + str(amount) + "."
+        msg = ower + " now owes " + owee + " " + Bot.CURRENCY + str(amount) + "."
     except ValueError:
         msg = strings.errNotInt
 
@@ -297,7 +297,7 @@ def list_owed_button(bot, update, user_data):
         ower = user_data["oweower"]
         owee = query.data[5:]
 
-        message_here = ower + " owes " + owee + " " + FinanceBot.CURRENCY \
+        message_here = ower + " owes " + owee + " " + Bot.CURRENCY \
                         + str(owed[chat_id][ower][owee])
         user_data.pop("oweower") # cleanup
     else:

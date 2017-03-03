@@ -5,7 +5,7 @@ from telegram.ext import (ConversationHandler, MessageHandler, CommandHandler,
                           Filters, CallbackQueryHandler)
 from telegram import InlineKeyboardMarkup, ReplyKeyboardRemove
 from modules import helper
-import FinanceBot
+import Bot
 
 """ This is the custom commands module, taking care of adding user defined
 commands, often as a joke
@@ -65,7 +65,7 @@ def handle_user_command(bot, update):
             update.message.reply_text(msg)
         except KeyError:
             # default to unknown commands handler
-            FinanceBot.unknown(bot, update)
+            Bot.unknown(bot, update)
 
     else:
         update.message.reply_text(errBadFormat)

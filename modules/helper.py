@@ -8,7 +8,7 @@ import json
 import os
 from modules import strings
 from telegram import InlineKeyboardButton
-import FinanceBot
+import Bot
 
 
 def loadjson(path):
@@ -30,7 +30,7 @@ def print_owed(owed, chat_id, ower):
     res = ""
     for owee in owed[chat_id][ower]:
         amount = owed[chat_id][ower][owee]
-        res += "\n" + ower + " owes " + owee + " " + FinanceBot.CURRENCY + str(amount)
+        res += "\n" + ower + " owes " + owee + " " + Bot.CURRENCY + str(amount)
 
     return res
 

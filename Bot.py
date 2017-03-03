@@ -1,6 +1,6 @@
 #!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
-""" This is the main file for the FinanceBot telegram bot.
+""" This is the main file for the Bot telegram bot.
 
 Here, the main function is the main element, which adds a series of handlers to
 describe how respond to the input given to the telegram bot by a user.
