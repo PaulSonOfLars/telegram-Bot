@@ -89,6 +89,7 @@ def main():
 
     # customcmds module (calls unknown command handler if unable to handle)
     dispatcher.add_handler(customcmds.set_user_command_handler)
+    dispatcher.add_handler(customcmds.rm_user_command_handler)
     dispatcher.add_handler(customcmds.user_command_handler)
 
     # unknown commands, leave last.
