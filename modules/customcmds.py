@@ -47,6 +47,7 @@ def rm_command(bot, update, args):
             cmd_name = "/" + args[0]
             try:
                 del cmds[chat_id][cmd_name]
+                helper.dumpjson(loc_cmdsjson, cmds)
                 print("removed command \"" + cmd_name + "\".")
             except KeyError:
                 return
