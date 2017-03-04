@@ -6,14 +6,13 @@ Functions that are commonly used accross multiple modules are found here.
 """
 import json
 import os
-from modules import strings
 from telegram import InlineKeyboardButton
 import Bot
 
 
 def loadjson(path):
     if not os.path.isfile(path) or not os.access(path, os.R_OK):
-        print(strings.errNoFile)
+        print(errNoFile)
         name = {}
         dumpjson(path, name)
     with open(path) as file:
@@ -49,3 +48,5 @@ def make_keyboard(data, callback_code):
         counter += 1
 
     return keyboard
+
+errNoFile = "Either file is missing or is not readable. Creating."
