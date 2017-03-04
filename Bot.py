@@ -33,6 +33,7 @@ CONFIG.read("Bot.ini")
 OWNER_ID = int(CONFIG["OWNER"]["Telegram_ID"])
 
 CURRENCY = CONFIG["SETTINGS"]["currency_code"]
+INVALID_HANDLER = CONFIG["SETTINGS"]["invalid_handler"]
 
 KEY = CONFIG["KEYS"]["BOT_API_KEY"]
 
@@ -46,12 +47,11 @@ LOGGER = logging.getLogger(__name__)
 
 def unknown(bot, update):
     """Used to respond to unknown command inputs, and deal with edge cases."""
-
-    if update.message.text == "/cancel":
-        update.message.reply_text(strings.errNothingToCancel)
-
-    else:
-        update.message.reply_text(strings.errUnknownCommand)
+    if INVALID_HANDLER == "True":
+        if update.message.text == "/cancel":
+            update.message.reply_text(strings.errNothingToCancel)
+        else:
+            update.message.reply_text(strings.errUnknownCommand)
 
 def main():
     """ The main section of the file. Checks the data dir, loads the

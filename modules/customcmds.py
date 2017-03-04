@@ -14,7 +14,6 @@ Command data is found in data/user_cmds.json.
 """
 
 def add_command(bot, update, args):
-    print("tf")
     cmds = helper.loadjson(loc_cmdsjson)
     chat_id = str(update.message.chat_id)
 
