@@ -72,6 +72,6 @@ Admin only:
 
 Note: some commands are WIP and so aren't shown here. Feel free to use them,\
 but keep in mind they might change in the future."""
-msgStart = "This is Bot! He can help you take care of your house finances. Use /help for more info."
+msgStart = "This is PolBot! He can help you take care of your house finances. Use /help for more info."
 
 msgIpAddress = "The bot's IP address is: "

@@ -14,13 +14,14 @@ Command data is found in data/user_cmds.json.
 """
 
 def add_command(bot, update, args):
+    print("tf")
     cmds = helper.loadjson(loc_cmdsjson)
     chat_id = str(update.message.chat_id)
 
     try:
         cmds[chat_id]
     except KeyError:
-        return
+        cmds[chat_id] = {}
 
     if len(args) == 1:
         update.message.reply_text(no_cmd_text_given)

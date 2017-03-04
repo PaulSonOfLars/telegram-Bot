@@ -5,7 +5,6 @@
 """
 
 # error strings
-errNoFile = "Either file is missing or is not readable. Creating."
 errBadFormat = "Command badly formatted. Use /help for help."
 errNotInt = "You gave me an invalid sum! Please only use numbers/decimals (ie, dont specify the currency, this is specified by the owner.)"
 errNotAdmin = "You are not admin! You can't run this command."
