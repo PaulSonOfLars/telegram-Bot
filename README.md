@@ -1,5 +1,5 @@
 # telegram-Bot
-A simple Telegram Bot written in python to keep track of expenses in a group chat.
+A simple modular Telegram Bot written in python.
 
 To use:
 1. Install requirements with `pip3 install -r requirements.txt`
@@ -7,4 +7,4 @@ To use:
 3. Run with `./Bot.py` or `python3.5 Bot.py`
 
 Run /help for help.
- 
+Modules can be added in the `modules` folder, and then added to the command list in the main bot.py file.
