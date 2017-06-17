@@ -11,3 +11,5 @@ Bot.ini
 *.pyc
 
 .pylintrc
+
+.idea
