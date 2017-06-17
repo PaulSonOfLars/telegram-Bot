@@ -10,6 +10,7 @@ from subprocess import check_output, CalledProcessError, TimeoutExpired
 from modules import strings
 import Bot
 
+
 def start(bot, update):
     """ First command a bot receives."""
     update.message.reply_text(msgStart)
@@ -22,8 +23,7 @@ def helpme(bot, update):
 
 def idme(bot, update):
     """ Sends user's telegram ID. """
-    update.message.reply_text("Your ID is: " \
-                              + str(update.message.from_user.id))
+    update.message.reply_text("Your ID is: " + str(update.message.from_user.id))
 
 
 def get_bot_ip(bot, update):
@@ -72,6 +72,8 @@ Admin only:
 
 Note: some commands are WIP and so aren't shown here. Feel free to use them,\
 but keep in mind they might change in the future."""
-msgStart = "This is PolBot! Just a modular bot made in python. Currently allows for custom message in response to commands in group chats. Promote to admin to keep it from missing messages! Try /cmd and /rmcmd to add commands :) "
+msgStart = "This is PolBot! Just a modular bot made in python. Currently allows for custom " \
+           "message in response to commands in group chats. Promote to admin to keep it from " \
+           "missing messages! Try /cmd and /rmcmd to add commands :) "
 
 msgIpAddress = "The bot's IP address is: "

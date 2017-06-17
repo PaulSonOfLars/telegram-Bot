@@ -39,14 +39,15 @@ def make_keyboard(data, callback_code):
     counter = 0
     keyboard = []
     for elem in data:
-        if counter%max_col_n == 0:
+        if counter % max_col_n == 0:
             keyboard.append([])
-                                    # // is used for integer division
-        keyboard[counter//max_col_n].append(InlineKeyboardButton(
+            # // is used for integer division
+        keyboard[counter // max_col_n].append(InlineKeyboardButton(
             elem,
             callback_data=callback_code + elem))
         counter += 1
 
     return keyboard
+
 
 errNoFile = "Either file is missing or is not readable. Creating."

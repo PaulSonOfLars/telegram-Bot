@@ -1,9 +1,7 @@
 #!/usr/bin/env python3.5
 # -*- coding: utf-8 -*-
 
-from telegram.ext import (ConversationHandler, MessageHandler, CommandHandler,
-                          Filters, CallbackQueryHandler)
-from telegram import InlineKeyboardMarkup, ReplyKeyboardRemove
+from telegram.ext import MessageHandler, CommandHandler, Filters
 from modules import helper
 import Bot
 
@@ -12,6 +10,7 @@ commands, often as a joke
 
 Command data is found in data/user_cmds.json.
 """
+
 
 def add_command(bot, update, args):
     cmds = helper.loadjson(loc_cmdsjson)
@@ -30,26 +29,27 @@ def add_command(bot, update, args):
         del args[0]
         cmd_data = " ".join(args)
         cmds[chat_id][cmd_name] = cmd_data
-        print("Added new cmd \"" + cmd_name + "\" with content \"" \
-                + cmd_data + "\".")
+        print("Added new cmd \"" + cmd_name + "\" with content \"" + cmd_data + "\".")
     else:
         update.message.reply_text(errBadFormat)
 
     helper.dumpjson(loc_cmdsjson, cmds)
 
-def rm_command(bot, update, args):
-        cmds = helper.loadjson(loc_cmdsjson)
-        chat_id = str(update.message.chat_id)
 
-        if len(args) == 1:
-            # remove command from command repo
-            cmd_name = "/" + args[0]
-            try:
-                del cmds[chat_id][cmd_name]
-                helper.dumpjson(loc_cmdsjson, cmds)
-                print("removed command \"" + cmd_name + "\".")
-            except KeyError:
-                return
+def rm_command(bot, update, args):
+    cmds = helper.loadjson(loc_cmdsjson)
+    chat_id = str(update.message.chat_id)
+
+    if len(args) == 1:
+        # remove command from command repo
+        cmd_name = "/" + args[0]
+        try:
+            del cmds[chat_id][cmd_name]
+            helper.dumpjson(loc_cmdsjson, cmds)
+            print("removed command \"" + cmd_name + "\".")
+        except KeyError:
+            return
+
 
 def handle_user_command(bot, update):
     cmds = helper.loadjson(loc_cmdsjson)
@@ -76,7 +76,6 @@ set_user_command_handler = CommandHandler("cmd", add_command, pass_args=True)
 rm_user_command_handler = CommandHandler("rmcmd", rm_command, pass_args=True)
 user_command_handler = MessageHandler(Filters.command, handle_user_command)
 
-
-loc_cmdsjson="./data/user_cmds.json"
-no_cmd_text_given="No command text given!"
-errBadFormat="Invalid format"
+loc_cmdsjson = "./data/user_cmds.json"
+no_cmd_text_given = "No command text given!"
+errBadFormat = "Invalid format"

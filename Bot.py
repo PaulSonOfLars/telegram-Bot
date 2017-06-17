@@ -18,7 +18,6 @@ import logging
 from telegram.ext import Updater, MessageHandler, Filters
 from modules import finance, misc, strings, notes, customcmds
 
-
 # if __name__ == '__main___':
 #     from modules import finance, misc, strings, notes
 # else:
@@ -37,13 +36,13 @@ INVALID_HANDLER = CONFIG["SETTINGS"]["invalid_handler"]
 
 KEY = CONFIG["KEYS"]["BOT_API_KEY"]
 
-
 # enable logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO)
 
 LOGGER = logging.getLogger(__name__)
+
 
 def unknown(bot, update):
     """Used to respond to unknown command inputs, and deal with edge cases."""
@@ -52,6 +51,7 @@ def unknown(bot, update):
             update.message.reply_text(strings.errNothingToCancel)
         else:
             update.message.reply_text(strings.errUnknownCommand)
+
 
 def main():
     """ The main section of the file. Checks the data dir, loads the
@@ -98,6 +98,7 @@ def main():
 
     updater.start_polling()
     updater.idle()
+
 
 # run main if run as script
 if __name__ == '__main__':

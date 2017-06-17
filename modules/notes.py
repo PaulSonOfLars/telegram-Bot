@@ -9,6 +9,7 @@ Note data is found in data/notes.json.
 from telegram.ext import CommandHandler
 from modules import helper, strings
 
+
 def save_note(bot, update, args):
     notes = helper.loadjson(loc_notesjson)
     chat_id = str(update.message.chat_id)
@@ -24,8 +25,7 @@ def save_note(bot, update, args):
         del args[0]
         note_data = " ".join(args)
         notes[chat_id][notename] = note_data
-        print("Added new note \"" + notename + "\" with content \"" \
-                + note_data + "\".")
+        print("Added new note \"" + notename + "\" with content \"" + note_data + "\".")
     else:
         update.message.reply_text(strings.errBadFormat)
 

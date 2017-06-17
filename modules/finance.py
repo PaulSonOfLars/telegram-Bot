@@ -33,14 +33,14 @@ def list_owed(bot, update, args):
         res = msgListMoneyOwed
 
     elif len(args) == 1:
-        if args[0] == "all": # if arg1 is "all", print all debts
+        if args[0] == "all":  # if arg1 is "all", print all debts
             if len(owed[chat_id]) == 0:
                 res = msgNoDebts
             else:
                 res = msgListMoneyOwed
                 for ower in owed[chat_id]:
                     res += helper.print_owed(owed, chat_id, ower)
-        else: # else, print debts of name
+        else:  # else, print debts of name
             try:
                 res = msgListMoneyOwedIndiv.format(args[0])
                 res += helper.print_owed(owed, chat_id, args[0])
@@ -185,8 +185,8 @@ def inline_owes(bot, update, args, user_data):
         else:
             try:
                 amount = owes_helper(chat_id, args[0], args[1], args[2])
-                update.message.reply_text(args[0] + " now owes " + args[1] + " " + \
-                                          Bot.CURRENCY + str(amount) + ".")
+                update.message.reply_text(args[0] + " now owes " + args[1] + " " + Bot.CURRENCY
+                                          + str(amount) + ".")
             except ValueError:
                 update.message.reply_text(strings.errNotInt)
 
@@ -194,7 +194,6 @@ def inline_owes(bot, update, args, user_data):
         update.message.reply_text(strings.errBadFormat)
 
     return ConversationHandler.END
-
 
 
 def cancel(bot, update, user_data):
@@ -230,7 +229,7 @@ def amount_owed(bot, update, user_data):
     amount = update.message.text
 
     try:
-        amount = owes_helper(chat_id, ower, owee, amount) # save
+        amount = owes_helper(chat_id, ower, owee, amount)  # save
         msg = ower + " now owes " + owee + " " + Bot.CURRENCY + str(amount) + "."
     except ValueError:
         msg = strings.errNotInt
@@ -246,7 +245,7 @@ def ower_button(bot, update, user_data):
     owed = helper.loadjson(loc_owedjson)
     query = update.callback_query
     chat_id = str(query.message.chat_id)
-    ower = query.data # this is the name pressed
+    ower = query.data  # this is the name pressed
     user_data["ower"] = ower
 
     try:
@@ -266,7 +265,7 @@ def ower_button(bot, update, user_data):
 def owee_button(bot, update, user_data):
     query = update.callback_query
     ower = user_data["ower"]
-    owee = query.data # this is the name pressed
+    owee = query.data  # this is the name pressed
     user_data["owee"] = owee
 
     bot.editMessageText(text=msgHowMuch.format(ower, owee),
@@ -298,8 +297,8 @@ def list_owed_button(bot, update, user_data):
         owee = query.data[5:]
 
         message_here = ower + " owes " + owee + " " + Bot.CURRENCY \
-                        + str(owed[chat_id][ower][owee])
-        user_data.pop("oweower") # cleanup
+                       + str(owed[chat_id][ower][owee])
+        user_data.pop("oweower")  # cleanup
     else:
         message_here = strings.errUnknownCallback
 
@@ -318,6 +317,7 @@ def reset_owes(bot, update, user_data):
     update.message.reply_text(strings.errCommandStillRunning,
                               reply_markup=ReplyKeyboardRemove())
     return ConversationHandler.END
+
 
 # define handlers
 clear_handler = CommandHandler("clear", clear, pass_args=True)
@@ -362,9 +362,11 @@ msgListMoneyOwed = "Here is a list of people owing money:\n"
 msgListMoneyOwedIndiv = "Here is a list of everyone {} owes money to: \n"
 
 msgHowMuch = "How much does {} owe {}? Please type a number."
-msgNewOwer = "{} was saved as a new ower. Please input the name of the person that {} owes money to."
+msgNewOwer = "{} was saved as a new ower. Please input the name of the person that {} owes " \
+             "money to."
 msgNewOwee = "{} was saved as a new owee for {}. " + msgHowMuch
-msgCurrentOwers = "Here is the current list of people who owe money. Please select one, or reply with a new name to add a new ower."
+msgCurrentOwers = "Here is the current list of people who owe money. Please select one, or reply " \
+                  "with a new name to add a new ower."
 msgWhoOwedTo = "Who does {} owe money to? Type in a new name to add a new owee."
 
 msgNoDebts = "Wow... there are no debts here!"

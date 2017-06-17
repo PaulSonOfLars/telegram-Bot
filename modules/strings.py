@@ -6,7 +6,8 @@
 
 # error strings
 errBadFormat = "Command badly formatted. Use /help for help."
-errNotInt = "You gave me an invalid sum! Please only use numbers/decimals (ie, dont specify the currency, this is specified by the owner.)"
+errNotInt = "You gave me an invalid sum! Please only use numbers/decimals (ie, dont specify " \
+            "the currency, this is specified by the owner.)"
 errNotAdmin = "You are not admin! You can't run this command."
 errNoOwer = "There is no-one here with this name: "
 errAllName = "\"all\" cannot be used as a name!"
